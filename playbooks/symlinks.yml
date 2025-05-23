@@ -20,7 +20,7 @@
         targets:
           - channel: "groovytoons"
             tag: "night"
-      - file: "SmilingFriends"
+      - file: "Smiling Friends"
         targets:
           - channel: "groovytoons"
             tag: "night"
