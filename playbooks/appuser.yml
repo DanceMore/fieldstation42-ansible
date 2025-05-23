@@ -69,6 +69,14 @@
         omz_disable_auto_title: true
       with_items: "{{ omz_users }}"
 
+    - name: copy tilda config
+      ansible.builtin.copy:
+        src: ../files/tilda/
+        dest: "{{ app_home }}/.config/tilda"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0644'
+
     - name: copy startup scripts
       ansible.builtin.copy:
         src: ../files/autostart/
