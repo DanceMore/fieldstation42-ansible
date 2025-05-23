@@ -1,0 +1,15 @@
+[Unit]
+Description=Start field_player
+After=graphical-session.target
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+Environment=VIRTUAL_ENV=/home/appuser/FieldStation42
+Environment=PATH=/home/appuser/FieldStation42/bin:/usr/bin:/bin
+ExecStart=/home/appuser/FieldStation42/bin/python3 /home/appuser/FieldStation42/field_player.py
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

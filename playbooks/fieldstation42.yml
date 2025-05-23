@@ -66,3 +66,11 @@
         group: "{{ app_group }}"
         mode: '0644'
       loop: "{{ lookup('fileglob', '../channels/*.json', wantlist=True) }}"
+
+    - name: Copy field_player systemd user service
+      copy:
+        src: files/field_player.service
+        dest: "{{ app_home }}/.config/systemd/user/field_player.service"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0644'
