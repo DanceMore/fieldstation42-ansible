@@ -3,6 +3,10 @@
   # we run this as local apply, as root, because sudo isn't even installed yet.
   #become: true
 
+  vars:
+    git_safe_directories:
+      - /home/appuser/.oh-my-zsh
+
   tasks:
     # Update apt cache
     - name: Update apt cache
@@ -23,3 +27,12 @@
           - bash
           - openssh-server  # This is the package for sshd on Debian
         state: present
+
+    # weird git safe.directory hack for ansible OMZ
+    - name: Ensure Git safe.directory entries are set in root's ~/.gitconfig
+      git_config:
+        name: safe.directory
+        value: "{{ item }}"
+        scope: global
+        state: present
+      loop: "{{ git_safe_directories }}"
