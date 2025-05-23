@@ -23,43 +23,28 @@
         update: yes
         force: yes
       become: yes
-      become_user: appuser
+      become_user: "{{ app_user }}"
 
     - name: Ensure conf directory exists
       file:
-        path: /home/appuser/FieldStation42/conf
+        path: "/home/{{ app_user }}/FieldStation42/conf"
         state: directory
-        owner: appuser
-        group: appuser
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
         mode: '0755'
 
     - name: Ensure catalog directory exists
       file:
-        path: /home/appuser/FieldStation42/catalog
+        path: "/home/{{ app_user }}/FieldStation42/catalog"
         state: directory
-        owner: appuser
-        group: appuser
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
         mode: '0755'
 
-    - name: Touch placeholder config file in conf (optional)
-      copy:
-        dest: /home/appuser/FieldStation42/conf/config.yaml
-        content: |
-          # Placeholder configuration for FieldStation42
-          station_name: "Field Station 42"
-          enabled: true
-        owner: appuser
-        group: appuser
-        mode: '0644'
-        force: no  # Only creates if it doesn't exist
-
-    - name: Touch placeholder catalog index (optional)
-      copy:
-        dest: /home/appuser/FieldStation42/catalog/index.yaml
-        content: |
-          # Placeholder catalog index
-          entries: []
-        owner: appuser
-        group: appuser
-        mode: '0644'
-        force: no
+    - name: Ensure runtime directory exists
+      file:
+        path: "/home/{{ app_user }}/FieldStation42/runtime"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
