@@ -18,6 +18,12 @@
           - tilda
         state: present
 
+    - name: Purge junk we don't want
+      apt:
+        name:
+          - light-locker
+        state: absent
+
     - name: Ensure autologin is set in lightdm.conf
       lineinfile:
         path: /etc/lightdm/lightdm.conf
