@@ -1,0 +1,15 @@
+{"station_conf" : {
+    "network_name" : "Guide",
+    "network_type" : "guide",
+    "channel_number": 3,
+    "runtime_dir" : "runtime/guide",
+    "content_dir" : "catalog/indie42_catalog/commercial/December",
+    "messages" : ["Reticulating splines...", "Aligning quantum subroutines...", "Synchronizing buffers...", "Decaffeinating RAM modules...",
+                  "Compiling infinite loop..."],
+    "images": ["runtime/guide/image0.png", "runtime/guide/image1.png", "runtime/guide/image2.png"],
+    "play_sound": true,
+    "sound_to_play": "runtime/guide/macroblank-menu.mp3",
+    "width": 1152,
+    "height": 720,
+    "footer_messages" : ["Why are you reading this?", ":3"]
+}}
