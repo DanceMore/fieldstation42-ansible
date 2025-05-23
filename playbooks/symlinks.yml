@@ -7,11 +7,44 @@
     app_home: /home/appuser
 
     content_symlinks:
+# CHANNEL 01: GroovyToons
+      - file: "Futurama"
+        targets:
+          - channel: "groovytoons"
+            tag: "day"
+      - file: "RegularShow"
+        targets:
+          - channel: "groovytoons"
+            tag: "day"
+      - file: "AquaTeen"
+        targets:
+          - channel: "groovytoons"
+            tag: "night"
+      - file: "SmilingFriends"
+        targets:
+          - channel: "groovytoons"
+            tag: "night"
+
+      - file: "unsorted-music_videos"
+        targets:
+          - channel: "groovytoons"
+            tag: "commercials"
+      - file: "tripsit-short_videos"
+        targets:
+          - channel: "groovytoons"
+            tag: "commercials"
+
+      - file: "custom_bumps"
+        targets:
+          - channel: "groovytoons"
+            tag: "bumps"
+
 # CHANNEL 02: TripSit
       - file: "tripsit-movies"
         targets:
           - channel: "tripsit"
             tag: "tripsit"
+
       - file: "tripsit-music_videos"
         targets:
           - channel: "tripsit"
@@ -24,6 +57,7 @@
         targets:
           - channel: "tripsit"
             tag: "commercials"
+
       - file: "custom_bumps"
         targets:
           - channel: "tripsit"
@@ -34,10 +68,16 @@
         targets:
           - channel: "80s-mtv"
             tag: "80s-mtv"
+
       - file: "retro_commercials"
         targets:
           - channel: "80s-mtv"
             tag: "commercials"
+
+      - file: "custom_bumps"
+        targets:
+          - channel: "80s-mtv"
+            tag: "bumps"
 
 # CHANNEL 09: PlanetEarth
       - file: "Planet Earth"
@@ -60,6 +100,44 @@
         targets:
           - channel: "planet_earth"
             tag: "planet_earth"
+
+      - file: "tripsit-music_videos"
+        targets:
+          - channel: "planet_earth"
+            tag: "commercials"
+      - file: "unsorted-music_videos"
+        targets:
+          - channel: "planet_earth"
+            tag: "commercials"
+      - file: "tripsit-short_videos"
+        targets:
+          - channel: "planet_earth"
+            tag: "commercials"
+
+      - file: "custom_bumps"
+        targets:
+          - channel: "planet_earth"
+            tag: "bumps"
+
+# CHANNEL 13: TheSimpsons
+      - file: "TheSimpsons"
+        targets:
+          - channel: "simpsons"
+            tag: "simpsons"
+
+      - file: "unsorted-music_videos"
+        targets:
+          - channel: "simpsons"
+            tag: "commercials"
+      - file: "tripsit-short_videos"
+        targets:
+          - channel: "simpsons"
+            tag: "commercials"
+
+      - file: "custom_bumps"
+        targets:
+          - channel: "simpsons"
+            tag: "bumps"
 
   tasks:
     - name: Create target directories
