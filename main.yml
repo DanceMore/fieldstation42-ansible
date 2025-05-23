@@ -1,0 +1,7 @@
+---
+# Main orchestration playbook
+- import_playbook: playbooks/baseline.yml
+- import_playbook: playbooks/appuser.yml
+#- import_playbook: python-app.yml  
+#- import_playbook: x11-setup.yml
+#- import_playbook: symlinks.yml

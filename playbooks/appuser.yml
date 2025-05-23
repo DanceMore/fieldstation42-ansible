@@ -1,0 +1,63 @@
+---
+- name: Create and manage appuser
+  hosts: all
+  #become: yes
+  vars:
+    app_user: appuser
+    app_group: appuser
+    app_home: /home/appuser
+    app_shell: /bin/zsh
+    
+  tasks:
+    - name: Create application group
+      group:
+        name: "{{ app_group }}"
+        state: present
+        
+    - name: Create application user
+      user:
+        name: "{{ app_user }}"
+        group: "{{ app_group }}"
+        home: "{{ app_home }}"
+        shell: "{{ app_shell }}"
+        create_home: yes
+        system: no
+        # this is intended for a shared admin + field deployment, it is not a secure password.
+        # this should be the hash of "kioskmode"
+        password: "$6$0RK4PanhwgjzdXws$VlglZTDmJVx2TjdeEgYOvz8C9fukbTh1ynbvoBkkl6nxa4d5oVPRNAhFvF3iyZ2RPOIKnLpruq1PUKvORuNrL."
+        state: present
+        
+    - name: Set proper permissions on home directory
+      file:
+        path: "{{ app_home }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
+        state: directory
+        
+    - name: Create application directories
+      file:
+        path: "{{ item }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
+        state: directory
+      loop:
+        - "{{ app_home }}/app"
+        - "{{ app_home }}/logs"
+        - "{{ app_home }}/config"
+        
+    - name: Verify user creation
+      command: id {{ app_user }}
+      register: user_check
+      changed_when: false
+      
+    - name: Display user information
+      debug:
+        msg: "User {{ app_user }} created successfully: {{ user_check.stdout }}"
+
+    - name: Run ansible-role-oh-my-zsh.
+      include_role:
+        name: "ansible-role-oh-my-zsh"
+      vars:
+        omz_user: "{{ app_user }}"

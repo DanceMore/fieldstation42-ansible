@@ -1,0 +1,25 @@
+- name: Setup Debian 12 system
+  hosts: all
+  # we run this as local apply, as root, because sudo isn't even installed yet.
+  #become: true
+
+  tasks:
+    # Update apt cache
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600  # Consider cache valid for 1 hour
+
+    # Install packages
+    - name: Install developer/admin packages
+      apt:
+        name:
+          - curl
+          - git
+          - screen
+          - vim-nox
+          - wget
+          - zsh
+          - bash
+          - openssh-server  # This is the package for sshd on Debian
+        state: present
