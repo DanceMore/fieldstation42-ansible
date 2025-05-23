@@ -1,0 +1,26 @@
+- name: Install Opinionated XORG stack for FieldStation42
+  hosts: all
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600  # Consider cache valid for 1 hour
+
+    - name: Install lightdm, xfce, and apps
+      apt:
+        name:
+          - lightdm
+          - pipewire
+          - easyeffects
+          - xfce4
+          - mpv
+          - tilda
+        state: present
+
+    - name: Ensure autologin is set in lightdm.conf
+      lineinfile:
+        path: /etc/lightdm/lightdm.conf
+        regexp: '^autologin-user\s*='
+        line: 'autologin-user = appuser'
+        insertafter: '^\[Seat:\*\]'
