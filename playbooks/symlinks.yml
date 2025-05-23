@@ -69,7 +69,11 @@
           - channel: "80s-mtv"
             tag: "80s-mtv"
 
-      - file: "retro_commercials"
+      - file: "shared_commercials"
+        targets:
+          - channel: "80s-mtv"
+            tag: "commercials"
+      - file: "mtv-beavis-and-butthead"
         targets:
           - channel: "80s-mtv"
             tag: "commercials"
