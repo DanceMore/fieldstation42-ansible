@@ -27,7 +27,7 @@
 
     - name: Ensure conf directory exists
       file:
-        path: "/home/{{ app_user }}/FieldStation42/conf"
+        path: "/home/{{ app_user }}/FieldStation42/confs"
         state: directory
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
@@ -48,3 +48,21 @@
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         mode: '0755'
+
+    - name: Touch runtime socket
+      copy:
+        dest: "/home/{{ app_user }}/FieldStation42/runtime/channel.socket"
+        content: ""
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0644'
+        force: no  # Only creates if it doesn't exist
+
+    - name: Copy channel config JSON files to FieldStation42/confs
+      copy:
+        src: "{{ item }}"
+        dest: "/home/{{ app_user }}/FieldStation42/confs/{{ item | basename }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0644'
+      loop: "{{ lookup('fileglob', '../channels/*.json', wantlist=True) }}"
