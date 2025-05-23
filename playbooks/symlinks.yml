@@ -1,0 +1,88 @@
+---
+- name: Manage symlinks for application content
+  hosts: all
+  vars:
+    app_user: appuser
+    app_group: appuser
+    app_home: /home/appuser
+
+    content_symlinks:
+# CHANNEL 02: TripSit
+      - file: "tripsit-movies"
+        targets:
+          - channel: "tripsit"
+            tag: "tripsit"
+      - file: "tripsit-music_videos"
+        targets:
+          - channel: "tripsit"
+            tag: "commercials"
+      - file: "unsorted-music_videos"
+        targets:
+          - channel: "tripsit"
+            tag: "commercials"
+      - file: "tripsit-short_videos"
+        targets:
+          - channel: "tripsit"
+            tag: "commercials"
+      - file: "custom_bumps"
+        targets:
+          - channel: "tripsit"
+            tag: "bumps"
+
+# CHANNEL 08: 80s-MTV
+      - file: "80s-mtv"
+        targets:
+          - channel: "80s-mtv"
+            tag: "80s-mtv"
+      - file: "retro_commercials"
+        targets:
+          - channel: "80s-mtv"
+            tag: "commercials"
+
+# CHANNEL 09: PlanetEarth
+      - file: "Planet Earth"
+        targets:
+          - channel: "planet_earth"
+            tag: "planet_earth"
+      - file: "Planet Earth II"
+        targets:
+          - channel: "planet_earth"
+            tag: "planet_earth"
+      - file: "Frozen Planet"
+        targets:
+          - channel: "planet_earth"
+            tag: "planet_earth"
+      - file: "Frozen Planet II"
+        targets:
+          - channel: "planet_earth"
+            tag: "planet_earth"
+      - file: "Our Planet (2019)"
+        targets:
+          - channel: "planet_earth"
+            tag: "planet_earth"
+
+  tasks:
+    - name: Create target directories
+      ansible.builtin.file:
+        path: "{{ app_home }}/FieldStation42/catalog/{{ target.channel }}/{{ target.tag }}"
+        state: directory
+        mode: '0755'
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+      loop: "{{ content_symlinks | subelements('targets') }}"
+      loop_control:
+        label: "{{ item.0.file }} -> {{ item.1.channel }}/{{ item.1.tag }}"
+      vars:
+        content_item: "{{ item.0 }}"
+        target: "{{ item.1 }}"
+
+    - name: Create symlinks to content
+      ansible.builtin.file:
+        src: "/home/appuser/content/{{ item.0.file }}"
+        dest: "/home/appuser/FieldStation42/catalog/{{ item.1.channel }}/{{ item.1.tag }}/{{ item.0.file }}"
+        state: link
+        force: true
+      loop: "{{ content_symlinks | subelements('targets') }}"
+      loop_control:
+        label: "{{ item.0.file }} -> {{ item.1.channel }}/{{ item.1.tag }}"
+
