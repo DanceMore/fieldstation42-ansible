@@ -1,25 +1,65 @@
-- name: Setup Debian 12 system
+- name: Clone FieldStation42 and prepare configuration
   hosts: all
-  # we run this as local apply, as root, because sudo isn't even installed yet.
-  #become: true
+  vars:
+    app_user: appuser
+    app_group: appuser
+    app_home: /home/appuser
+    app_shell: /bin/zsh
 
   tasks:
-    # Update apt cache
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600  # Consider cache valid for 1 hour
+    - name: Ensure appuser home directory exists
+      file:
+        path: "{{ app_home }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        state: directory
+        mode: '0755'
 
-    # Install packages
-    - name: Install developer/admin packages
-      apt:
-        name:
-          - curl
-          - git
-          - screen
-          - vim-nox
-          - wget
-          - zsh
-          - bash
-          - openssh-server  # This is the package for sshd on Debian
-        state: present
+    - name: Clone FieldStation42 repo
+      git:
+        repo: https://github.com/shane-mason/FieldStation42
+        dest: "{{ app_home }}/FieldStation42"
+        version: main
+        update: yes
+        force: yes
+      become: yes
+      become_user: appuser
+
+    - name: Ensure conf directory exists
+      file:
+        path: /home/appuser/FieldStation42/conf
+        state: directory
+        owner: appuser
+        group: appuser
+        mode: '0755'
+
+    - name: Ensure catalog directory exists
+      file:
+        path: /home/appuser/FieldStation42/catalog
+        state: directory
+        owner: appuser
+        group: appuser
+        mode: '0755'
+
+    - name: Touch placeholder config file in conf (optional)
+      copy:
+        dest: /home/appuser/FieldStation42/conf/config.yaml
+        content: |
+          # Placeholder configuration for FieldStation42
+          station_name: "Field Station 42"
+          enabled: true
+        owner: appuser
+        group: appuser
+        mode: '0644'
+        force: no  # Only creates if it doesn't exist
+
+    - name: Touch placeholder catalog index (optional)
+      copy:
+        dest: /home/appuser/FieldStation42/catalog/index.yaml
+        content: |
+          # Placeholder catalog index
+          entries: []
+        owner: appuser
+        group: appuser
+        mode: '0644'
+        force: no

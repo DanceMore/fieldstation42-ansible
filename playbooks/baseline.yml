@@ -6,6 +6,7 @@
   vars:
     git_safe_directories:
       - /home/appuser/.oh-my-zsh
+      - /home/appuser/FieldStation42
 
   tasks:
     # Update apt cache
@@ -29,10 +30,14 @@
         state: present
 
     # weird git safe.directory hack for ansible OMZ
-    - name: Ensure Git safe.directory entries are set in root's ~/.gitconfig
-      git_config:
-        name: safe.directory
-        value: "{{ item }}"
-        scope: global
-        state: present
-      loop: "{{ git_safe_directories }}"
+    - name: Ensure root Git config has only expected safe.directory entries
+      copy:
+        dest: /root/.gitconfig
+        content: |
+          [safe]
+          {% for dir in git_safe_directories %}
+          directory = {{ dir }}
+          {% endfor %}
+        owner: root
+        group: root
+        mode: '0644'
