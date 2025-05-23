@@ -30,6 +30,8 @@
         # this should be the hash of "kioskmode"
         password: "$6$0RK4PanhwgjzdXws$VlglZTDmJVx2TjdeEgYOvz8C9fukbTh1ynbvoBkkl6nxa4d5oVPRNAhFvF3iyZ2RPOIKnLpruq1PUKvORuNrL."
         state: present
+        groups: audio,video,plugdev,users,netdev
+        append: yes
         
     - name: Set proper permissions on home directory
       file:
@@ -66,3 +68,19 @@
         omz_zsh_theme: "gentoo"
         omz_disable_auto_title: true
       with_items: "{{ omz_users }}"
+
+    - name: copy startup scripts
+      ansible.builtin.copy:
+        src: ../files/autostart/
+        dest: "{{ app_home }}/.config/autostart"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0644'
+
+    - name: copy runtime scripts
+      ansible.builtin.copy:
+        src: ../files/scripts/
+        dest: "{{ app_home }}/scripts"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'

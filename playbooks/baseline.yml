@@ -22,6 +22,7 @@
           - curl
           - git
           - screen
+          - ruby
           - vim-nox
           - wget
           - zsh

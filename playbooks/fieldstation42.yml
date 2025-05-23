@@ -25,6 +25,24 @@
       become: yes
       become_user: "{{ app_user }}"
 
+    - name: configure venv
+      ansible.builtin.pip:
+        virtualenv: "{{ app_home }}/FieldStation42"
+        virtualenv_command: /usr/bin/python3 -m venv
+        requirements: "{{ app_home }}/FieldStation42/requirements.txt"
+
+    - name: configure venv with glfw
+      ansible.builtin.pip:
+        name: glfw
+        virtualenv: "{{ app_home }}/FieldStation42"
+        virtualenv_command: /usr/bin/python3 -m venv
+
+    - name: configure venv with PyOpenGL
+      ansible.builtin.pip:
+        name: PyOpenGL
+        virtualenv: "{{ app_home }}/FieldStation42"
+        virtualenv_command: /usr/bin/python3 -m venv
+
     - name: Ensure conf directory exists
       file:
         path: "/home/{{ app_user }}/FieldStation42/confs"
@@ -66,11 +84,3 @@
         group: "{{ app_group }}"
         mode: '0644'
       loop: "{{ lookup('fileglob', '../channels/*.json', wantlist=True) }}"
-
-    - name: Copy field_player systemd user service
-      copy:
-        src: files/field_player.service
-        dest: "{{ app_home }}/.config/systemd/user/field_player.service"
-        owner: "{{ app_user }}"
-        group: "{{ app_group }}"
-        mode: '0644'
