@@ -7,6 +7,10 @@
     app_group: appuser
     app_home: /home/appuser
     app_shell: /bin/zsh
+    omz_users:
+      - name: appuser
+        group: appuser
+        settings: ""
     
   tasks:
     - name: Create application group
@@ -43,9 +47,7 @@
         mode: '0755'
         state: directory
       loop:
-        - "{{ app_home }}/app"
-        - "{{ app_home }}/logs"
-        - "{{ app_home }}/config"
+        - "{{ app_home }}/content"
         
     - name: Verify user creation
       command: id {{ app_user }}
@@ -58,6 +60,9 @@
 
     - name: Run ansible-role-oh-my-zsh.
       include_role:
-        name: "ansible-role-oh-my-zsh"
+        name: "ctorgalson.oh-my-zsh"
       vars:
-        omz_user: "{{ app_user }}"
+        omz_user: "{{ item }}"
+        omz_zsh_theme: "gentoo"
+        omz_disable_auto_title: true
+      with_items: "{{ omz_users }}"
