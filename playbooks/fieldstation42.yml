@@ -71,25 +71,25 @@
     # TODO: replace with site-local files instead
     - name: Copy static.mp4
       copy:
-        srct: "/home/{{ app_user }}/FieldStation42/docs/static.mp4"
+        src: "/home/{{ app_user }}/FieldStation42/docs/static.mp4"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/static.mp4"
         remote_src: no
 
     - name: Copy standby.png
       copy:
-        srct: "/home/{{ app_user }}/FieldStation42/docs/standby.png"
+        src: "/home/{{ app_user }}/FieldStation42/docs/standby.png"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/standby.png"
         remote_src: no
 
     - name: Copy off_air_pattern.mp4
       copy:
-        srct: "/home/{{ app_user }}/FieldStation42/docs/off_air_pattern.mp4"
+        src: "/home/{{ app_user }}/FieldStation42/docs/off_air_pattern.mp4"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/off_air_pattern.mp4"
         remote_src: no
 
     - name: Copy signoff.mp4
       copy:
-        srct: "/home/{{ app_user }}/FieldStation42/docs/signoff.mp4"
+        src: "/home/{{ app_user }}/FieldStation42/docs/signoff.mp4"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/signoff.mp4"
         remote_src: no
 
