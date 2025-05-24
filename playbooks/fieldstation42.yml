@@ -102,6 +102,14 @@
         mode: '0644'
         force: no  # Only creates if it doesn't exist
 
+    - name: copy guide content to runtime
+      ansible.builtin.copy:
+        src: ../guide/
+        dest: "{{ app_home }}/runtime/guide"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0644'
+
     - name: Copy channel config JSON files to FieldStation42/confs
       copy:
         src: "{{ item }}"
