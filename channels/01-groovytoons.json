@@ -20,9 +20,9 @@
     "standby_image": "runtime/standby.png",
 
     "monday": {
-        "7": {"tags": "day"},
-        "8": {"tags": "day"},
-        "9": {"tags": "day"},
+        "7": {"tags": "morning"},
+        "8": {"tags": "morning"},
+        "9": {"tags": "morning"},
         "10": {"tags" : "day"},
         "11": {"tags" : "day"},
         "12": {"tags" : "day"},
@@ -42,9 +42,9 @@
         "2": {"event" : "signoff"}
     },
     "tuesday": {
-        "7": {"tags": "day"},
-        "8": {"tags": "day"},
-        "9": {"tags": "day"},
+        "7": {"tags": "morning"},
+        "8": {"tags": "morning"},
+        "9": {"tags": "morning"},
         "10": {"tags" : "day"},
         "11": {"tags" : "day"},
         "12": {"tags" : "day"},
@@ -64,9 +64,9 @@
         "2": {"event" : "signoff"}
     },
     "wednesday": {
-        "7": {"tags": "day"},
-        "8": {"tags": "day"},
-        "9": {"tags": "day"},
+        "7": {"tags": "morning"},
+        "8": {"tags": "morning"},
+        "9": {"tags": "morning"},
         "10": {"tags" : "day"},
         "11": {"tags" : "day"},
         "12": {"tags" : "day"},
@@ -86,9 +86,9 @@
         "2": {"event" : "signoff"}
     },
     "thursday": {
-        "7": {"tags": "day"},
-        "8": {"tags": "day"},
-        "9": {"tags": "day"},
+        "7": {"tags": "morning"},
+        "8": {"tags": "morning"},
+        "9": {"tags": "morning"},
         "10": {"tags" : "day"},
         "11": {"tags" : "day"},
         "12": {"tags" : "day"},
@@ -108,9 +108,9 @@
         "2": {"event" : "signoff"}
     },
     "friday": {
-        "7": {"tags": "day"},
-        "8": {"tags": "day"},
-        "9": {"tags": "day"},
+        "7": {"tags": "morning"},
+        "8": {"tags": "morning"},
+        "9": {"tags": "morning"},
         "10": {"tags" : "day"},
         "11": {"tags" : "day"},
         "12": {"tags" : "day"},
@@ -130,9 +130,9 @@
         "2": {"event" : "signoff"}
     },
     "saturday": {
-        "7": {"tags": "day"},
-        "8": {"tags": "day"},
-        "9": {"tags": "day"},
+        "7": {"tags": "morning"},
+        "8": {"tags": "morning"},
+        "9": {"tags": "morning"},
         "10": {"tags" : "day"},
         "11": {"tags" : "day"},
         "12": {"tags" : "day"},
@@ -152,9 +152,9 @@
         "2": {"event" : "signoff"}
     },
     "sunday": {
-        "7": {"tags": "day"},
-        "8": {"tags": "day"},
-        "9": {"tags": "day"},
+        "7": {"tags": "morning"},
+        "8": {"tags": "morning"},
+        "9": {"tags": "morning"},
         "10": {"tags" : "day"},
         "11": {"tags" : "day"},
         "12": {"tags" : "day"},

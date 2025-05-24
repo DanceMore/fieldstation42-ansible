@@ -8,6 +8,15 @@
 
     content_symlinks:
       # CHANNEL 01: GroovyToons
+      - file: "Yo Gabba Gabba!"
+        targets:
+          - channel: "groovytoons"
+            tag: "morning"
+      - file: "We Bare Bears"
+        targets:
+          - channel: "groovytoons"
+            tag: "morning"
+
       - file: "Ed, Edd n Eddy"
         targets:
           - channel: "groovytoons"
@@ -20,6 +29,7 @@
         targets:
           - channel: "groovytoons"
             tag: "day"
+
       - file: "Invader ZIM"
         targets:
           - channel: "groovytoons"
@@ -28,6 +38,7 @@
         targets:
           - channel: "groovytoons"
             tag: "afternoon"
+
       - file: "Futurama"
         targets:
           - channel: "groovytoons"
