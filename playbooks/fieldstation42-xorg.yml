@@ -21,6 +21,7 @@
           - wireplumber
           - rtkit # REQUIRED for pipewire / pulseaudio
           - easyeffects
+          - conky-std
           - xfce4
           - xfce4-terminal
           - tilda
@@ -42,3 +43,13 @@
         regexp: "^autologin-user\\s*="
         line: "autologin-user = appuser"
         insertafter: "^\\[Seat:\\*\\]"
+
+    - name: Copy desktop wallpaper
+      ansible.builtin.copy:
+        src: ../files/misc/2560px-SMPTE_Color_Bars.svg.png
+        dest: "/home/appuser/2560px-SMPTE_Color_Bars.svg.png"
+
+    - name: Copy conkyrc
+      ansible.builtin.copy:
+        src: ../files/misc/conkyrc
+        dest: "/home/appuser/.conkyrc"

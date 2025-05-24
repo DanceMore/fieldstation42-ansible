@@ -3,10 +3,18 @@
 require 'json'
 
 # Simple MIDI listener - writes JSON to socket on specific notes
+# Logs debug output to a file instead of STDOUT
 # Usage: ruby midi_listener.rb
 
 MIDI_PORT = "20:0"
 SOCKET_PATH = "/home/appuser/FieldStation42/runtime/channel.socket"
+LOG_PATH = "/home/appuser/FieldStation42/runtime/midi_listener.log"
+
+# Redirect STDOUT and STDERR to the log file
+log_file = File.open(LOG_PATH, 'a')
+log_file.sync = true
+$stdout.reopen(log_file)
+$stderr.reopen(log_file)
 
 # Define what JSON to write for each note
 NOTES = {
