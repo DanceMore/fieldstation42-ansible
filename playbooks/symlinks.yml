@@ -7,7 +7,7 @@
     app_home: /home/appuser
 
     content_symlinks:
-# CHANNEL 01: GroovyToons
+      # CHANNEL 01: GroovyToons
       - file: "Futurama"
         targets:
           - channel: "groovytoons"
@@ -39,7 +39,7 @@
           - channel: "groovytoons"
             tag: "bumps"
 
-# CHANNEL 02: TripSit
+      # CHANNEL 02: TripSit
       - file: "tripsit-movies"
         targets:
           - channel: "tripsit"
@@ -63,7 +63,7 @@
           - channel: "tripsit"
             tag: "bumps"
 
-# CHANNEL 08: 80s-MTV
+      # CHANNEL 08: 80s-MTV
       - file: "80s-mtv"
         targets:
           - channel: "80s-mtv"
@@ -83,7 +83,7 @@
           - channel: "80s-mtv"
             tag: "bumps"
 
-# CHANNEL 09: PlanetEarth
+      # CHANNEL 09: PlanetEarth
       - file: "Planet Earth"
         targets:
           - channel: "planet_earth"
@@ -123,7 +123,7 @@
           - channel: "planet_earth"
             tag: "bumps"
 
-# CHANNEL 13: TheSimpsons
+      # CHANNEL 13: TheSimpsons
       - file: "TheSimpsons"
         targets:
           - channel: "simpsons"
@@ -148,7 +148,7 @@
       ansible.builtin.file:
         path: "{{ app_home }}/FieldStation42/catalog/{{ target.channel }}/{{ target.tag }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
       loop: "{{ content_symlinks | subelements('targets') }}"
@@ -167,4 +167,3 @@
       loop: "{{ content_symlinks | subelements('targets') }}"
       loop_control:
         label: "{{ item.0.file }} -> {{ item.1.channel }}/{{ item.1.tag }}"
-

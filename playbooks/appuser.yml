@@ -11,66 +11,66 @@
       - name: appuser
         group: appuser
         settings: ""
-    
+
   tasks:
     - name: Create application group
-      group:
+      ansible.builtin.group:
         name: "{{ app_group }}"
         state: present
-        
+
     - name: Create application user
-      user:
+      ansible.builtin.user:
         name: "{{ app_user }}"
         group: "{{ app_group }}"
         home: "{{ app_home }}"
         shell: "{{ app_shell }}"
-        create_home: yes
-        system: no
+        create_home: true
+        system: false
         # this is intended for a shared admin + field deployment, it is not a secure password.
         # this should be the hash of "kioskmode"
         password: "$6$0RK4PanhwgjzdXws$VlglZTDmJVx2TjdeEgYOvz8C9fukbTh1ynbvoBkkl6nxa4d5oVPRNAhFvF3iyZ2RPOIKnLpruq1PUKvORuNrL."
         state: present
         groups: audio,video,plugdev,users,netdev
-        append: yes
-        
+        append: true
+
     - name: Set proper permissions on home directory
-      file:
+      ansible.builtin.file:
         path: "{{ app_home }}"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0755'
+        mode: "0755"
         state: directory
 
     - name: Set up multiple authorized keys
       ansible.posix.authorized_key:
         user: "{{ app_user }}"
         state: present
-        key: '{{ item }}'
+        key: "{{ item }}"
       with_file:
         - ../files/public_keys/user.key
         - ../files/public_keys/yubi.key
-        
+
     - name: Create application directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0755'
+        mode: "0755"
         state: directory
       loop:
         - "{{ app_home }}/content"
-        
+
     - name: Verify user creation
-      command: id {{ app_user }}
+      ansible.builtin.command: id {{ app_user }}
       register: user_check
       changed_when: false
-      
+
     - name: Display user information
-      debug:
+      ansible.builtin.debug:
         msg: "User {{ app_user }} created successfully: {{ user_check.stdout }}"
 
     - name: Run ansible-role-oh-my-zsh.
-      include_role:
+      ansible.builtin.include_role:
         name: "ctorgalson.oh-my-zsh"
       vars:
         omz_user: "{{ item }}"
@@ -78,26 +78,26 @@
         omz_disable_auto_title: true
       with_items: "{{ omz_users }}"
 
-    - name: copy tilda config
+    - name: Copy tilda config
       ansible.builtin.copy:
         src: ../files/tilda/
         dest: "{{ app_home }}/.config/tilda"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0644'
+        mode: "0644"
 
-    - name: copy startup scripts
+    - name: Copy startup scripts
       ansible.builtin.copy:
         src: ../files/autostart/
         dest: "{{ app_home }}/.config/autostart"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0644'
+        mode: "0644"
 
-    - name: copy runtime scripts
+    - name: Copy runtime scripts
       ansible.builtin.copy:
         src: ../files/scripts/
         dest: "{{ app_home }}/scripts"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0755'
+        mode: "0755"

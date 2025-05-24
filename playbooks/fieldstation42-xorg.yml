@@ -1,14 +1,15 @@
+---
 - name: Install Opinionated XORG stack for FieldStation42
   hosts: all
 
   tasks:
     - name: Update apt cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600  # Consider cache valid for 1 hour
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600 # Consider cache valid for 1 hour
 
     - name: Install lightdm, xfce, and apps
-      apt:
+      ansible.builtin.apt:
         name:
           - lightdm
           - xorg
@@ -30,14 +31,14 @@
         state: present
 
     - name: Purge junk we don't want
-      apt:
+      ansible.builtin.apt:
         name:
           - light-locker
         state: absent
 
     - name: Ensure autologin is set in lightdm.conf
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/lightdm/lightdm.conf
-        regexp: '^autologin-user\s*='
-        line: 'autologin-user = appuser'
-        insertafter: '^\[Seat:\*\]'
+        regexp: "^autologin-user\\s*="
+        line: "autologin-user = appuser"
+        insertafter: "^\\[Seat:\\*\\]"

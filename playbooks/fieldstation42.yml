@@ -1,3 +1,4 @@
+---
 - name: Clone FieldStation42 and prepare configuration
   hosts: all
   vars:
@@ -8,113 +9,113 @@
 
   tasks:
     - name: Ensure appuser home directory exists
-      file:
+      ansible.builtin.file:
         path: "{{ app_home }}"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Clone FieldStation42 repo
-      git:
+      ansible.builtin.git:
         repo: https://github.com/shane-mason/FieldStation42
         dest: "{{ app_home }}/FieldStation42"
         version: main
-        update: yes
-        force: yes
-      become: yes
+        update: true
+        force: true
+      become: true
       become_user: "{{ app_user }}"
 
-    - name: configure venv
+    - name: Configure venv
       ansible.builtin.pip:
         virtualenv: "{{ app_home }}/FieldStation42"
         virtualenv_command: /usr/bin/python3 -m venv
         requirements: "{{ app_home }}/FieldStation42/requirements.txt"
 
-    - name: configure venv with glfw
+    - name: Configure venv with glfw
       ansible.builtin.pip:
         name: glfw
         virtualenv: "{{ app_home }}/FieldStation42"
         virtualenv_command: /usr/bin/python3 -m venv
 
-    - name: configure venv with PyOpenGL
+    - name: Configure venv with PyOpenGL
       ansible.builtin.pip:
         name: PyOpenGL
         virtualenv: "{{ app_home }}/FieldStation42"
         virtualenv_command: /usr/bin/python3 -m venv
 
     - name: Ensure conf directory exists
-      file:
+      ansible.builtin.file:
         path: "/home/{{ app_user }}/FieldStation42/confs"
         state: directory
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0755'
+        mode: "0755"
 
     - name: Ensure catalog directory exists
-      file:
+      ansible.builtin.file:
         path: "/home/{{ app_user }}/FieldStation42/catalog"
         state: directory
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0755'
+        mode: "0755"
 
     - name: Ensure runtime directory exists
-      file:
+      ansible.builtin.file:
         path: "/home/{{ app_user }}/FieldStation42/runtime"
         state: directory
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0755'
+        mode: "0755"
 
     # Copy media files to runtime directory
     # TODO: replace with site-local files instead
     - name: Copy static.mp4
-      copy:
+      ansible.builtin.copy:
         src: "/home/{{ app_user }}/FieldStation42/docs/static.mp4"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/static.mp4"
-        remote_src: yes
+        remote_src: true
 
     - name: Copy standby.png
-      copy:
+      ansible.builtin.copy:
         src: "/home/{{ app_user }}/FieldStation42/docs/standby.png"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/standby.png"
-        remote_src: yes
+        remote_src: true
 
     - name: Copy off_air_pattern.mp4
-      copy:
+      ansible.builtin.copy:
         src: "/home/{{ app_user }}/FieldStation42/docs/off_air_pattern.mp4"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/off_air_pattern.mp4"
-        remote_src: yes
+        remote_src: true
 
     - name: Copy signoff.mp4
-      copy:
+      ansible.builtin.copy:
         src: "/home/{{ app_user }}/FieldStation42/docs/signoff.mp4"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/signoff.mp4"
-        remote_src: yes
+        remote_src: true
 
     - name: Touch runtime socket
-      copy:
+      ansible.builtin.copy:
         dest: "/home/{{ app_user }}/FieldStation42/runtime/channel.socket"
         content: ""
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0644'
-        force: no  # Only creates if it doesn't exist
+        mode: "0644"
+        force: false # Only creates if it doesn't exist
 
-    - name: copy guide content to runtime
+    - name: Copy guide content to runtime
       ansible.builtin.copy:
         src: ../guide/
         dest: "{{ app_home }}/FieldStation42/runtime/guide"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0644'
+        mode: "0644"
 
     - name: Copy channel config JSON files to FieldStation42/confs
-      copy:
+      ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ app_home }}/FieldStation42/confs/{{ item | basename }}"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: '0644'
+        mode: "0644"
       loop: "{{ lookup('fileglob', '../channels/*.json', wantlist=True) }}"
