@@ -8,19 +8,43 @@
 
     content_symlinks:
       # CHANNEL 01: GroovyToons
-      - file: "Futurama"
+      - file: "Ed, Edd n Eddy"
         targets:
           - channel: "groovytoons"
             tag: "day"
+      - file: "The Powerpuff Girls"
+        targets:
+          - channel: "groovytoons"
+            tag: "day"
+      - file: "We Bare Bears"
+        targets:
+          - channel: "groovytoons"
+            tag: "day"
+      - file: "Invader ZIM"
+        targets:
+          - channel: "groovytoons"
+            tag: "afternoon"
       - file: "RegularShow"
         targets:
           - channel: "groovytoons"
-            tag: "day"
+            tag: "afternoon"
+      - file: "Futurama"
+        targets:
+          - channel: "groovytoons"
+            tag: "night"
       - file: "AquaTeen"
         targets:
           - channel: "groovytoons"
             tag: "night"
+      - file: "Sealab 2021"
+        targets:
+          - channel: "groovytoons"
+            tag: "night"
       - file: "Smiling Friends"
+        targets:
+          - channel: "groovytoons"
+            tag: "night"
+      - file: "The Ren and Stimpy Show"
         targets:
           - channel: "groovytoons"
             tag: "night"
