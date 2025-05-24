@@ -9,6 +9,16 @@
       - /home/appuser/FieldStation42
 
   tasks:
+    - name: Ensure APT does not install recommends or suggests
+      copy:
+        dest: /etc/apt/apt.conf.d/99no-recommends
+        content: |
+          APT::Install-Recommends "false";
+          APT::Install-Suggests "false";
+        owner: root
+        group: root
+        mode: '0644'
+
     # Update apt cache
     - name: Update apt cache
       apt:
@@ -19,6 +29,7 @@
     - name: Install developer/admin packages
       apt:
         name:
+          - aptitude
           - curl
           - git
           - screen
