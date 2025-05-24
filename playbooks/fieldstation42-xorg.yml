@@ -12,11 +12,19 @@
         name:
           - lightdm
           - xorg
+          - pulseaudio
           - pipewire
+          - pipewire-alsa
+          - pipewire-audio
+          - pipewire-pulse
+          - wireplumber
+          - rtkit # REQUIRED for pipewire / pulseaudio
           - easyeffects
           - xfce4
           - xfce4-terminal
           - tilda
+          - alsa-utils
+          - pavucontrol
           - ffmpeg
           - mpv
         state: present
