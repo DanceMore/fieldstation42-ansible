@@ -6,7 +6,7 @@ require 'json'
 # Usage: ruby midi_listener.rb
 
 MIDI_PORT = "20:0"
-SOCKET_PATH = "FieldStation42/runtime/channel.socket"
+SOCKET_PATH = "/home/appuser/FieldStation42/runtime/channel.socket"
 
 # Define what JSON to write for each note
 NOTES = {
