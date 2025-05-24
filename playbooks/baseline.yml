@@ -36,11 +36,11 @@
     - name: Install developer/admin packages
       apt:
         name:
-          - sudo
           - aptitude
           - curl
           - git
           - screen
+          - rsync
           - ruby
           - vim-nox
           - wget

@@ -11,9 +11,11 @@
       apt:
         name:
           - lightdm
+          - xorg
           - pipewire
           - easyeffects
           - xfce4
+          - xfce4-terminal
           - mpv
           - tilda
         state: present
