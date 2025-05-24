@@ -40,6 +40,15 @@
         group: "{{ app_group }}"
         mode: '0755'
         state: directory
+
+    - name: Set up multiple authorized keys
+      ansible.posix.authorized_key:
+        user: "{{ app_user }}"
+        state: present
+        key: '{{ item }}'
+      with_file:
+        - ../files/public_keys/user.key
+        - ../files/public_keys/yubi.key
         
     - name: Create application directories
       file:

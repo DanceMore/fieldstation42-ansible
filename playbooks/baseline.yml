@@ -41,7 +41,7 @@
           - openssh-server  # This is the package for sshd on Debian
         state: present
 
-    # weird git safe.directory hack for ansible OMZ
+    # weird git safe.directory hack for ansible + git
     - name: Ensure root Git config has only expected safe.directory entries
       copy:
         dest: /root/.gitconfig
@@ -53,3 +53,17 @@
         owner: root
         group: root
         mode: '0644'
+
+#  - name: Configure ssh clients
+#    include_role:
+#      name: dev-sec.ssh-hardening
+#    vars:
+
+    - name: Set up multiple authorized keys
+      ansible.posix.authorized_key:
+        user: root
+        state: present
+        key: '{{ item }}'
+      with_file:
+        - ../files/public_keys/user.key
+        - ../files/public_keys/yubi.key
