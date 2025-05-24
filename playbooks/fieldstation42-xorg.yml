@@ -16,8 +16,9 @@
           - easyeffects
           - xfce4
           - xfce4-terminal
-          - mpv
           - tilda
+          - ffmpeg
+          - mpv
         state: present
 
     - name: Purge junk we don't want
