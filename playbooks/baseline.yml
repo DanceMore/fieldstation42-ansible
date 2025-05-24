@@ -25,10 +25,18 @@
         update_cache: yes
         cache_valid_time: 3600  # Consider cache valid for 1 hour
 
-    # Install packages
+    # install sudo ASAP for future ansible
+    - name: Install sudo
+      apt:
+        name:
+          - sudo
+        state: present
+
+    # install more packages
     - name: Install developer/admin packages
       apt:
         name:
+          - sudo
           - aptitude
           - curl
           - git
