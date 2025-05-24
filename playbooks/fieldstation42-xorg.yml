@@ -53,3 +53,8 @@
       ansible.builtin.copy:
         src: ../files/misc/conkyrc
         dest: "/home/appuser/.conkyrc"
+
+    - name: Copy conkyrc-right
+      ansible.builtin.copy:
+        src: ../files/misc/conkyrc-right
+        dest: "/home/appuser/.conkyrc-right"
