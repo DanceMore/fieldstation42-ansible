@@ -1,0 +1,8 @@
+# Toggle shaders off with 'h' key
+h cycle-values glsl-shaders ""
+
+# use c to rotate effects...
+c cycle-values glsl-shaders ""{% for shader in shader_files.files | map(attribute='path') | map('basename') | sort %} "~/.config/mpv/shaders/{{ shader }}"{% endfor %}
+
+# use z to rotate effects backwards...
+z cycle-values glsl-shaders ""{% for shader in shader_files.files | map(attribute='path') | map('basename') | sort | reverse %} "~/.config/mpv/shaders/{{ shader }}"{% endfor %}

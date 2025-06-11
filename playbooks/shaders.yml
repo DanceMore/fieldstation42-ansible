@@ -1,0 +1,50 @@
+---
+- name: Configure MPV with dynamic shader list
+  hosts: all
+  vars:
+    app_user: appuser
+    app_group: appuser
+    mpv_config_dir: "/home/appuser/.config/mpv"
+    shaders_source_dir: "../files/mpv/shaders"
+  
+  tasks:
+    - name: Create MPV config directory
+      file:
+        path: "{{ mpv_config_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
+
+    - name: Create MPV shaders directory
+      file:
+        path: "{{ mpv_config_dir }}/shaders"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0755'
+
+    - name: Find all shader files
+      find:
+        paths: "{{ shaders_source_dir }}"
+        patterns: "*.glsl"
+      register: shader_files
+      delegate_to: localhost
+
+    - name: Copy shader files
+      ansible.builtin.copy:
+        src: "{{ shaders_source_dir }}"
+        dest: "{{ mpv_config_dir }}/"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: "0644"
+
+    - name: Generate input.conf from template
+      template:
+        src: ../files/mpv/input.conf.j2
+        dest: "{{ mpv_config_dir }}/input.conf"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        mode: '0644'
+      vars:
+        shader_names: "{{ shader_files.files | map(attribute='path') | map('basename') | map('regex_replace', '\\.glsl$', '') | list }}"
