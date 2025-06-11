@@ -60,6 +60,15 @@
           - channel: "groovytoons"
             tag: "night"
 
+      - file: "The Grim Adventures of Billy & Mandy"
+        targets:
+          - channel: "groovytoons"
+            tag: "halloween"
+      - file: "The Midnight Gospel"
+        targets:
+          - channel: "groovytoons"
+            tag: "halloween"
+
       - file: "unsorted-music_videos"
         targets:
           - channel: "groovytoons"
@@ -75,11 +84,36 @@
             tag: "bumps"
 
       # CHANNEL 02: TripSit
+      - file: "tripsit-films"
+        targets:
+          - channel: "tripsit"
+            tag: "tripsit"
       - file: "tripsit-movies"
         targets:
           - channel: "tripsit"
             tag: "tripsit"
+      - file: "tripsit-films-animated"
+        targets:
+          - channel: "tripsit"
+            tag: "tripsit"
+      - file: "tripsit-films-comedy"
+        targets:
+          - channel: "tripsit"
+            tag: "tripsit"
+      - file: "The Midnight Gospel"
+        targets:
+          - channel: "tripsit"
+            tag: "tripsit"
 
+      - file: "tripsit-films-halloween"
+        targets:
+          - channel: "tripsit"
+            tag: "halloween"
+
+      - file: "animusic-videos"
+        targets:
+          - channel: "tripsit"
+            tag: "commercials"
       - file: "tripsit-music_videos"
         targets:
           - channel: "tripsit"
@@ -139,6 +173,10 @@
         targets:
           - channel: "planet_earth"
             tag: "planet_earth"
+      - file: "Island of the Sea Wolves"
+        targets:
+          - channel: "planet_earth"
+            tag: "planet_earth"
 
       - file: "tripsit-music_videos"
         targets:
@@ -163,6 +201,11 @@
         targets:
           - channel: "simpsons"
             tag: "simpsons"
+
+      - file: "TreehouseOfHorror"
+        targets:
+          - channel: "simpsons"
+            tag: "halloween"
 
       - file: "unsorted-music_videos"
         targets:
