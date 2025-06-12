@@ -29,6 +29,7 @@
           - pavucontrol
           - ffmpeg
           - mpv
+          - xdotool
         state: present
 
     - name: Purge junk we don't want

@@ -11,6 +11,7 @@ import argparse
 import re
 import json
 import os
+import subprocess
 
 SOCKET_PATH = "/home/appuser/FieldStation42/runtime/channel.socket"
 LOG_PATH = "/home/appuser/FieldStation42/runtime/ir_mapper.log"
@@ -24,6 +25,16 @@ def write_json_to_socket(data):
     except Exception as e:
         print(f"Error writing to socket: {e}")
 
+def send_key_to_mpv(key):
+    try:
+        window_id = subprocess.check_output(
+            ['xdotool', 'search', '--onlyvisible', '--class', 'mpv'],
+            env={'DISPLAY': ':0'}
+        ).decode().strip().split('\n')[0]
+        subprocess.run(['xdotool', 'key', '--window', window_id, key], env={'DISPLAY': ':0'})
+    except Exception as e:
+        print(f"Failed to send key '{key}' to mpv: {e}")
+
 def CHANNEL_UP():
     print("📺 Channel UP!")
     write_json_to_socket({"command": "up", "channel": -1})
@@ -34,9 +45,11 @@ def CHANNEL_DOWN():
 
 def EFFECT_NEXT():
     print("✨ Next effect!")
+    send_key_to_mpv('c')
 
 def EFFECT_PREV():
     print("✨ Previous effect!")
+    send_key_to_mpv('z')
 
 def UNMAPPED_EVENT(event_name):
     print(f"❓ Unmapped event: {event_name}")
