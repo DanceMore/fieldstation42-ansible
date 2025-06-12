@@ -27,5 +27,5 @@ conky.config = {
 };
 
 conky.text = [[
-${exec tail -n 20 /home/appuser/FieldStation42/runtime/midi_listener.log}
+${exec tail -n 20 /home/appuser/FieldStation42/runtime/ir_mapper.log}
 ]];

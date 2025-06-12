@@ -1,6 +1,7 @@
 #!/bin/sh
 
-ruby /home/appuser/scripts/midi-listener.rb &
+#ruby /home/appuser/scripts/midi-listener.rb &
+python3 /home/appuser/scripts/flipper_ir_remote.py --log-to-file &
 
 cd /home/appuser/FieldStation42
 
