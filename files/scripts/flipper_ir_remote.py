@@ -80,8 +80,8 @@ REMOTE_CONFIGS = {
         "mappings": {
             "0x11": "CHANNEL_UP",
             "0x14": "CHANNEL_DOWN",
-            "0x10": "EFFECT_NEXT",
-            "0x12": "EFFECT_PREV",
+            "0x10": "EFFECT_PREV",
+            "0x12": "EFFECT_NEXT",
         }
     },
     "samsung_tv": {
