@@ -30,7 +30,7 @@
         # this should be the hash of "kioskmode"
         password: "$6$0RK4PanhwgjzdXws$VlglZTDmJVx2TjdeEgYOvz8C9fukbTh1ynbvoBkkl6nxa4d5oVPRNAhFvF3iyZ2RPOIKnLpruq1PUKvORuNrL."
         state: present
-        groups: audio,video,plugdev,users,netdev
+        groups: audio,video,plugdev,users,netdev,dialout
         append: true
 
     - name: Set proper permissions on home directory
