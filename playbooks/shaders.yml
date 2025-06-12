@@ -31,13 +31,27 @@
       register: shader_files
       delegate_to: localhost
 
-    - name: Copy shader files
-      ansible.builtin.copy:
-        src: "{{ shaders_source_dir }}"
-        dest: "{{ mpv_config_dir }}/"
+    - name: Synchronize shader files
+      ansible.posix.synchronize:
+        src: "{{ shaders_source_dir }}/"
+        dest: "{{ mpv_config_dir }}/shaders/"
+        delete: yes
+        recursive: yes
+        perms: yes
+        owner: no
+        group: no
+        times: yes
+        rsync_opts:
+          - "--include=*.glsl"
+          - "--exclude=*"
+
+    - name: Set ownership for shader files
+      file:
+        path: "{{ mpv_config_dir }}/shaders"
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
-        mode: "0644"
+        recurse: yes
+        state: directory
 
     - name: Generate input.conf from template
       template:
