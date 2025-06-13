@@ -19,7 +19,7 @@ SOCKET_PATH = "/home/appuser/FieldStation42/runtime/channel.socket"
 LOG_PATH = "/home/appuser/FieldStation42/runtime/ir_mapper.log"
 
 class ChannelDialer:
-    def __init__(self, digit_timeout=2.5, easter_egg_timeout=1.5):
+    def __init__(self, digit_timeout=1.5, easter_egg_timeout=1.5):
         self.digit_queue = deque()
         self.digit_timeout = digit_timeout
         self.easter_egg_timeout = easter_egg_timeout
@@ -41,55 +41,93 @@ class ChannelDialer:
     
     def add_digit(self, digit):
         """Add a digit to the queue and manage timing"""
-        with self.lock:
-            self.digit_queue.append(str(digit))
-            self.last_digit_time = time.time()
-            
-            # Cancel existing timer
-            if self.timer:
-                self.timer.cancel()
-            
-            # Check for immediate Easter egg matches (like 911)
-            current_sequence = ''.join(self.digit_queue)
-            if current_sequence in self.easter_eggs:
-                print(f"🎯 Easter egg triggered: {current_sequence}")
-                self.easter_eggs[current_sequence]()
+        try:
+            with self.lock:
+                self.digit_queue.append(str(digit))
+                self.last_digit_time = time.time()
+                
+                # Cancel existing timer
+                if self.timer:
+                    self.timer.cancel()
+                    self.timer = None
+                
+                # Check for immediate Easter egg matches (like 911)
+                current_sequence = ''.join(self.digit_queue)
+                if current_sequence in self.easter_eggs:
+                    print(f"🎯 Easter egg triggered: {current_sequence}")
+                    try:
+                        self.easter_eggs[current_sequence]()
+                    except Exception as e:
+                        print(f"Easter egg execution error: {e}")
+                    # Clear queue but don't return - system is ready for new input
+                    self.digit_queue.clear()
+                    print("🎮 Ready for new input...")
+                    return
+                
+                # Set new timer for regular channel processing
+                self.timer = threading.Timer(self.digit_timeout, self._process_channel)
+                self.timer.start()
+        except Exception as e:
+            print(f"Add digit error: {e}")
+            # Try to recover by clearing the queue
+            try:
                 self.clear_queue()
-                return
-            
-            # Set new timer for regular channel processing
-            self.timer = threading.Timer(self.digit_timeout, self._process_channel)
-            self.timer.start()
+            except:
+                pass
     
     def clear_queue(self):
         """Clear the digit queue"""
-        with self.lock:
-            self.digit_queue.clear()
-            if self.timer:
-                self.timer.cancel()
-                self.timer = None
+        try:
+            with self.lock:
+                self.digit_queue.clear()
+                if self.timer:
+                    self.timer.cancel()
+                    self.timer = None
+        except Exception as e:
+            print(f"Clear queue error: {e}")
+            # Force clear even if lock fails
+            try:
+                self.digit_queue.clear()
+                if self.timer:
+                    self.timer.cancel()
+                    self.timer = None
+            except:
+                pass
     
     def _process_channel(self):
         """Process accumulated digits as channel number"""
-        with self.lock:
-            if not self.digit_queue:
-                return
-            
-            channel_str = ''.join(self.digit_queue)
-            
-            # Check for Easter eggs one more time
-            if channel_str in self.easter_eggs:
-                print(f"🎯 Easter egg triggered: {channel_str}")
-                self.easter_eggs[channel_str]()
-            else:
-                try:
-                    channel_num = int(channel_str)
-                    self.tune_to_channel(channel_num)
-                except ValueError:
-                    print(f"❌ Invalid channel sequence: {channel_str}")
-            
-            self.digit_queue.clear()
-            self.timer = None
+        try:
+            with self.lock:
+                if not self.digit_queue:
+                    return
+                
+                channel_str = ''.join(self.digit_queue)
+                
+                # Check for Easter eggs one more time
+                if channel_str in self.easter_eggs:
+                    print(f"🎯 Easter egg triggered: {channel_str}")
+                    try:
+                        self.easter_eggs[channel_str]()
+                    except Exception as e:
+                        print(f"Easter egg execution error: {e}")
+                else:
+                    try:
+                        channel_num = int(channel_str)
+                        self.tune_to_channel(channel_num)
+                    except ValueError:
+                        print(f"❌ Invalid channel sequence: {channel_str}")
+                
+                self.digit_queue.clear()
+                self.timer = None
+        except Exception as e:
+            print(f"Channel processing error: {e}")
+            # Ensure we clean up even if there's an error
+            try:
+                with self.lock:
+                    self.digit_queue.clear()
+                    self.timer = None
+            except:
+                pass
     
     def tune_to_channel(self, channel):
         """Tune to specific channel number"""
@@ -100,85 +138,113 @@ class ChannelDialer:
             "timestamp": time.time()
         })
     
-    # Easter egg functions
+    # Easter egg functions - all with exception handling
     def emergency_mode(self):
-        print("🚨 EMERGENCY MODE ACTIVATED! 🚨")
-        #write_json_to_socket({
-        #    "command": "easter_egg",
-        #    "type": "emergency",
-        #    "message": "911 Emergency Mode",
-        #    "timestamp": time.time()
-        #})
-        #send_key_to_mpv('9')  # Could trigger special emergency feed
+        try:
+            print("🚨 EMERGENCY MODE ACTIVATED! 🚨")
+            #write_json_to_socket({
+            #    "command": "easter_egg",
+            #    "type": "emergency",
+            #    "message": "911 Emergency Mode",
+            #    "timestamp": time.time()
+            #})
+            # Safely try to send key to mpv
+            try:
+                send_key_to_mpv('c')  # Could trigger special emergency feed
+            except Exception as e:
+                print(f"Easter egg mpv command failed: {e}")
+        except Exception as e:
+            print(f"Emergency mode error: {e}")
     
     def demon_mode(self):
-        print("😈 DEMON MODE ACTIVATED! 😈")
-        #write_json_to_socket({
-        #    "command": "easter_egg",
-        #    "type": "demon",
-        #    "message": "666 Demon Mode - Spooky!",
-        #    "timestamp": time.time()
-        #})
-        # Could activate horror/dark content filter
+        try:
+            print("😈 DEMON MODE ACTIVATED! 😈")
+            #write_json_to_socket({
+            #    "command": "easter_egg",
+            #    "type": "demon",
+            #    "message": "666 Demon Mode - Spooky!",
+            #    "timestamp": time.time()
+            #})
+            # Could activate horror/dark content filter
+        except Exception as e:
+            print(f"Demon mode error: {e}")
     
     def party_mode(self):
-        print("🎉 PARTY MODE ACTIVATED! 🎉")
-        #write_json_to_socket({
-        #    "command": "easter_egg",
-        #    "type": "party",
-        #    "message": "420 Party Time!",
-        #    "timestamp": time.time()
-        #})
-        # Could activate party music or special effects
+        try:
+            print("🎉 PARTY MODE ACTIVATED! 🎉")
+            #write_json_to_socket({
+            #    "command": "easter_egg",
+            #    "type": "party",
+            #    "message": "420 Party Time!",
+            #    "timestamp": time.time()
+            #})
+            # Could activate party music or special effects
+        except Exception as e:
+            print(f"Party mode error: {e}")
     
     def lucky_mode(self):
-        print("🍀 LUCKY MODE ACTIVATED! 🍀")
-        #write_json_to_socket({
-        #    "command": "easter_egg",
-        #    "type": "lucky",
-        #    "message": "777 Lucky Number!",
-        #    "timestamp": time.time()
-        #})
-        # Could shuffle to random "lucky" channel
+        try:
+            print("🍀 LUCKY MODE ACTIVATED! 🍀")
+            #write_json_to_socket({
+            #    "command": "easter_egg",
+            #    "type": "lucky",
+            #    "message": "777 Lucky Number!",
+            #    "timestamp": time.time()
+            #})
+            # Could shuffle to random "lucky" channel
+        except Exception as e:
+            print(f"Lucky mode error: {e}")
     
     def test_mode(self):
-        print("🧪 TEST MODE ACTIVATED! 🧪")
-        #write_json_to_socket({
-        #    "command": "easter_egg",
-        #    "type": "test",
-        #    "message": "123 Test Sequence",
-        #    "timestamp": time.time()
-        #})
-        # Could run system diagnostics
+        try:
+            print("🧪 TEST MODE ACTIVATED! 🧪")
+            #write_json_to_socket({
+            #    "command": "easter_egg",
+            #    "type": "test",
+            #    "message": "123 Test Sequence",
+            #    "timestamp": time.time()
+            #})
+            # Could run system diagnostics
+        except Exception as e:
+            print(f"Test mode error: {e}")
     
     def reset_mode(self):
-        print("🔄 RESET MODE ACTIVATED! 🔄")
-        #write_json_to_socket({
-        #    "command": "easter_egg",
-        #    "type": "reset",
-        #    "message": "000 System Reset",
-        #    "timestamp": time.time()
-        #})
-        # Could reset to default channel or restart system
+        try:
+            print("🔄 RESET MODE ACTIVATED! 🔄")
+            #write_json_to_socket({
+            #    "command": "easter_egg",
+            #    "type": "reset",
+            #    "message": "000 System Reset",
+            #    "timestamp": time.time()
+            #})
+            # Could reset to default channel or restart system
+        except Exception as e:
+            print(f"Reset mode error: {e}")
     
     def error_mode(self):
-        print("💥 ERROR MODE ACTIVATED! 💥")
-        #write_json_to_socket({
-        #    "command": "easter_egg",
-        #    "type": "error",
-        #    "message": "404 Not Found!",
-        #    "timestamp": time.time()
-        #})
-        # Could show error screen or glitch effects
+        try:
+            print("💥 ERROR MODE ACTIVATED! 💥")
+            #write_json_to_socket({
+            #    "command": "easter_egg",
+            #    "type": "error",
+            #    "message": "404 Not Found!",
+            #    "timestamp": time.time()
+            #})
+            # Could show error screen or glitch effects
+        except Exception as e:
+            print(f"Error mode error: {e}")
     
     def fun_mode(self):
-        print("😄 FUN MODE ACTIVATED! 😄")
-        #write_json_to_socket({
-        #    "command": "easter_egg",
-        #    "type": "fun",
-        #    "message": "Secret fun code activated!",
-        #    "timestamp": time.time()
-        #})
+        try:
+            print("😄 FUN MODE ACTIVATED! 😄")
+            #write_json_to_socket({
+            #    "command": "easter_egg",
+            #    "type": "fun",
+            #    "message": "Secret fun code activated!",
+            #    "timestamp": time.time()
+            #})
+        except Exception as e:
+            print(f"Fun mode error: {e}")
 
 # Global channel dialer instance
 channel_dialer = ChannelDialer()
@@ -437,7 +503,7 @@ def main():
                         help='Show raw IR data')
     parser.add_argument('--debounce', '-t', type=float, default=0.7,
                         help='Debounce time in seconds')
-    parser.add_argument('--digit-timeout', type=float, default=2.5,
+    parser.add_argument('--digit-timeout', type=float, default=1.5,
                         help='Timeout for digit sequence in seconds')
     parser.add_argument('--log-to-file', action='store_true',
                         help='Log output to file instead of terminal')
