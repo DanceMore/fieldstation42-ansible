@@ -92,6 +92,16 @@ REMOTE_CONFIGS = {
             "0x10": "CHANNEL_DOWN"
         }
     },
+    "sony": {
+        "protocol": "SIRC",
+        "address": "0x01",
+        "mappings": {
+            "0x10": "CHANNEL_UP",
+            "0x11": "CHANNEL_DOWN"
+            "0x33": "EFFECT_NEXT",
+            "0x34": "EFFECT_PREV",
+        }
+    },
 }
 
 def map_ir_signal(protocol, address, command):
