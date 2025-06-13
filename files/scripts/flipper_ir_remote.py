@@ -89,7 +89,7 @@ REMOTE_CONFIGS = {
         "address": "0x07",
         "mappings": {
             "0x12": "CHANNEL_UP",
-            "0x10": "CHANNEL_DOWN"
+            "0x10": "CHANNEL_DOWN",
         }
     },
     "sony": {
@@ -97,7 +97,7 @@ REMOTE_CONFIGS = {
         "address": "0x01",
         "mappings": {
             "0x10": "CHANNEL_UP",
-            "0x11": "CHANNEL_DOWN"
+            "0x11": "CHANNEL_DOWN",
             "0x33": "EFFECT_NEXT",
             "0x34": "EFFECT_PREV",
         }
