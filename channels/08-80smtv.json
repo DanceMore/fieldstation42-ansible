@@ -3,7 +3,7 @@
     "channel_number": 8,
 
     "network_type": "standard",
-    "schedule_increment": 2,
+    "schedule_increment": 5,
     "break_strategy": "end",
     "commercial_free": false, 
 

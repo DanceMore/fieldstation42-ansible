@@ -16,7 +16,7 @@
           - pulseaudio
           - pipewire
           #- pipewire-alsa
-          - pipewire-audio
+          #- pipewire-audio
           - pipewire-pulse
           - wireplumber
           - rtkit # REQUIRED for pipewire / pulseaudio
