@@ -6,3 +6,6 @@ c cycle-values glsl-shaders ""{% for shader in shader_files.files | map(attribut
 
 # use z to rotate effects backwards...
 z cycle-values glsl-shaders ""{% for shader in shader_files.files | map(attribute='path') | map('basename') | sort | reverse %} "~/.config/mpv/shaders/{{ shader }}"{% endfor %}
+
+# use b for digital effect on/off
+b cycle-values glsl-shaders "" "~/.config/mpv/shaders/8bit.glsl"

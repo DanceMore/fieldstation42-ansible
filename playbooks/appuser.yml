@@ -49,6 +49,7 @@
       with_file:
         - ../files/public_keys/user.key
         - ../files/public_keys/yubi.key
+        - ../files/public_keys/nas.key
 
     - name: Create application directories
       ansible.builtin.file:

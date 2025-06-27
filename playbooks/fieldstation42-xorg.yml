@@ -15,7 +15,7 @@
           - xorg
           - pulseaudio
           - pipewire
-          - pipewire-alsa
+          #- pipewire-alsa
           - pipewire-audio
           - pipewire-pulse
           - wireplumber
