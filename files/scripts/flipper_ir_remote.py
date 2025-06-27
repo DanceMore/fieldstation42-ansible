@@ -363,6 +363,10 @@ def DIGIT_9():
     print("9️⃣ Digit 9")
     channel_dialer.add_digit(9)
 
+def DIGITAL_ANALOG():
+    print("✨ Digital / Analog effect!")
+    send_key_to_mpv('b')
+
 def UNMAPPED_EVENT(event_name):
     print(f"❓ Unmapped event: {event_name}")
 
@@ -473,6 +477,8 @@ REMOTE_CONFIGS = {
             "0x07": "DIGIT_8",
             "0x08": "DIGIT_9",
             "0x09": "DIGIT_0",
+
+            "0x77": "DIGITAL_ANALOG",
         }
     },
 }
