@@ -477,8 +477,13 @@ REMOTE_CONFIGS = {
             "0x07": "DIGIT_8",
             "0x08": "DIGIT_9",
             "0x09": "DIGIT_0",
-
-            "0x77": "DIGITAL_ANALOG",
+        }
+    },
+    "sony_0x77": {
+        "protocol": "SIRC",
+        "address": "0x77",
+        "mappings": {
+            "0x0D": "DIGITAL_ANALOG",
         }
     },
 }
