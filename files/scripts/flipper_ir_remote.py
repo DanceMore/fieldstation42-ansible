@@ -266,8 +266,8 @@ class ChannelDialer:
         """Handle channel up with validation"""
         # Show switching indicator
         if self.display:
-            self.display.display_text(">>")
-            time.sleep(0.2)  # Brief switching animation
+            self.display.display_text("UP")
+            time.sleep(0.4)  # Brief switching animation
 
         # Find next valid channel
         current_idx = VALID_CHANNELS.index(self.current_channel) if self.current_channel in VALID_CHANNELS else 0
@@ -289,8 +289,8 @@ class ChannelDialer:
         """Handle channel down with validation"""
         # Show switching indicator
         if self.display:
-            self.display.display_text("<<")
-            time.sleep(0.2)  # Brief switching animation
+            self.display.display_text("Dn")
+            time.sleep(0.4)  # Brief switching animation
 
         # Find previous valid channel
         current_idx = VALID_CHANNELS.index(self.current_channel) if self.current_channel in VALID_CHANNELS else 0
@@ -419,7 +419,7 @@ def CHANNEL_DOWN():
 def EFFECT_NEXT():
     print("✨ Next effect!")
     if display_controller:
-        display_controller.display_text("FX+")
+        display_controller.display_text("EFuP")
         # Use a timer to return to channel display after brief show
         threading.Timer(0.5, lambda: display_controller.display_number(channel_dialer.current_channel)).start()
     send_key_to_mpv('c')
@@ -427,7 +427,7 @@ def EFFECT_NEXT():
 def EFFECT_PREV():
     print("✨ Previous effect!")
     if display_controller:
-        display_controller.display_text("FX-")
+        display_controller.display_text("EFdn")
         threading.Timer(0.5, lambda: display_controller.display_number(channel_dialer.current_channel)).start()
     send_key_to_mpv('z')
 
@@ -672,7 +672,7 @@ def main():
     parser = argparse.ArgumentParser(description='Enhanced IR Remote Event Mapper with Channel Dialing and 7-Segment Display')
     parser.add_argument('--device', '-d', default='/dev/ttyACM0',
                         help='Flipper Zero serial device')
-    parser.add_argument('--display-device', default=None,
+    parser.add_argument('--display-device', default='/dev/ttyACM0',
                         help='7-segment display serial device (e.g., /dev/ttyUSB0)')
     parser.add_argument('--display-baud', type=int, default=9600,
                         help='Display serial baudrate')
@@ -703,11 +703,13 @@ def main():
     # Show initial channel on display (at end)
     if display_controller.display_serial:
         display_controller.display_text("----")
-        time.sleep(0.3)
-        display_controller.display_text("BOOT")
         time.sleep(0.8)
-        display_controller.display_text("OK")
-        time.sleep(0.5)
+        display_controller.display_text("ACId")
+        time.sleep(0.4)
+        display_controller.display_text("BOOT")
+        time.sleep(2.0)
+        display_controller.display_text("redY")
+        time.sleep(1.5)
         display_controller.display_number(channel_dialer.current_channel)
 
     log_file = setup_logging(args.log_to_file)
