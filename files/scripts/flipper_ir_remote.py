@@ -689,8 +689,15 @@ def main():
     # Initialize channel dialer with display
     channel_dialer = ChannelDialer(digit_timeout=args.digit_timeout, display_controller=display_controller)
     
-    # Show initial channel on display
+    # Boot sequence
+    # Show initial channel on display (at end)
     if display_controller.display_serial:
+        display_controller.display_text("----")
+        time.sleep(0.3)
+        display_controller.display_text("BOOT")
+        time.sleep(0.8)
+        display_controller.display_text("OK")
+        time.sleep(0.5)
         display_controller.display_number(channel_dialer.current_channel)
 
     log_file = setup_logging(args.log_to_file)
