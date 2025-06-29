@@ -261,43 +261,53 @@ class ChannelDialer:
                 "fallback_channel": self.current_channel,
                 "timestamp": time.time()
             })
-    
+
     def channel_up(self):
         """Handle channel up with validation"""
+        # Show switching indicator
+        if self.display:
+            self.display.display_text(">>")
+            time.sleep(0.2)  # Brief switching animation
+
         # Find next valid channel
         current_idx = VALID_CHANNELS.index(self.current_channel) if self.current_channel in VALID_CHANNELS else 0
         next_idx = (current_idx + 1) % len(VALID_CHANNELS)
         next_channel = VALID_CHANNELS[next_idx]
-        
+
         print(f"📺 Channel UP: {self.current_channel} -> {next_channel}")
         self.current_channel = next_channel
         if self.display:
             self.display.display_number(self.current_channel)
-        
+
         write_json_to_socket({
             "command": "up", 
             "channel": self.current_channel,
             "timestamp": time.time()
-        })
-    
+        })  
+
     def channel_down(self):
         """Handle channel down with validation"""
+        # Show switching indicator
+        if self.display:
+            self.display.display_text("<<")
+            time.sleep(0.2)  # Brief switching animation
+
         # Find previous valid channel
         current_idx = VALID_CHANNELS.index(self.current_channel) if self.current_channel in VALID_CHANNELS else 0
         prev_idx = (current_idx - 1) % len(VALID_CHANNELS)
         prev_channel = VALID_CHANNELS[prev_idx]
-        
+
         print(f"📺 Channel DOWN: {self.current_channel} -> {prev_channel}")
         self.current_channel = prev_channel
         if self.display:
             self.display.display_number(self.current_channel)
-        
+
         write_json_to_socket({
             "command": "down", 
             "channel": self.current_channel,
             "timestamp": time.time()
         })
-    
+
     # Easter egg functions - all with exception handling
     def emergency_mode(self):
         try:
