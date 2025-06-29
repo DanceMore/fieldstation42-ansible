@@ -250,8 +250,8 @@ class ChannelDialer:
             print(f"❌ Invalid channel: {channel} (valid: {VALID_CHANNELS})")
             # Show invalid channel briefly, then revert to current
             if self.display:
-                self.display.display_text("INVD")
-                time.sleep(1.5)
+                self.display.display_text("NOPE")
+                time.sleep(0.8)
                 self.display.display_number(self.current_channel)
             # Still send the command but mark as invalid - let TV decide
             write_json_to_socket({
@@ -408,10 +408,17 @@ def CHANNEL_DOWN():
 
 def EFFECT_NEXT():
     print("✨ Next effect!")
+    if display_controller:
+        display_controller.display_text("FX+")
+        # Use a timer to return to channel display after brief show
+        threading.Timer(0.5, lambda: display_controller.display_number(channel_dialer.current_channel)).start()
     send_key_to_mpv('c')
 
 def EFFECT_PREV():
     print("✨ Previous effect!")
+    if display_controller:
+        display_controller.display_text("FX-")
+        threading.Timer(0.5, lambda: display_controller.display_number(channel_dialer.current_channel)).start()
     send_key_to_mpv('z')
 
 def VOLUME_UP():
