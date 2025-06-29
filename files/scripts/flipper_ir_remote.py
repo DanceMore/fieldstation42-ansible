@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-IR Remote Mapper - Enhanced with channel dialing, Easter eggs, and pause-based entry
-Maps IR signals to standardized events with intelligent digit queue system
+IR Remote Mapper - Enhanced with channel dialing, Easter eggs, pause-based entry, and 7-segment display
+Maps IR signals to standardized events with intelligent digit queue system and display control
 """
 
 import serial
@@ -18,14 +18,92 @@ from collections import deque
 SOCKET_PATH = "/home/appuser/FieldStation42/runtime/channel.socket"
 LOG_PATH = "/home/appuser/FieldStation42/runtime/ir_mapper.log"
 
+# Valid channels - super simple array for now
+VALID_CHANNELS = [1, 2, 3, 8, 9, 13]
+
+class DisplayController:
+    """Handles 7-segment display communication via serial"""
+
+    def __init__(self, display_device=None, baudrate=9600):
+        self.display_serial = None
+        self.display_device = display_device
+        self.baudrate = baudrate
+        self.lock = threading.Lock()
+        
+        if display_device:
+            self.connect_display()
+    
+    def connect_display(self):
+        """Connect to the display serial device"""
+        try:
+            if self.display_device:
+                self.display_serial = serial.Serial(self.display_device, self.baudrate, timeout=1)
+                time.sleep(0.1)  # Give display time to initialize
+                print(f"📟 Display connected on {self.display_device}")
+                # Test the display
+                self.display_text("INIT")
+                time.sleep(0.5)
+                self.clear_display()
+        except Exception as e:
+            print(f"❌ Failed to connect to display: {e}")
+            self.display_serial = None
+    
+    def send_display_command(self, command):
+        """Send command to display with error handling"""
+        if not self.display_serial:
+            print(f"📟 Display command (no device): {command}")
+            return False
+            
+        try:
+            with self.lock:
+                cmd_bytes = f"{command}\r\n".encode('ascii')
+                self.display_serial.write(cmd_bytes)
+                self.display_serial.flush()
+                print(f"📟 Display: {command}")
+                return True
+        except Exception as e:
+            print(f"❌ Display error: {e}")
+            return False
+    
+    def display_text(self, text):
+        """Display text (up to 4 chars)"""
+        text = str(text)[:4].upper()  # Limit to 4 chars and uppercase
+        return self.send_display_command(f"DISP:{text}")
+    
+    def display_number(self, number):
+        """Display number (up to 4 digits)"""
+        if isinstance(number, (int, float)):
+            number = int(number)
+        num_str = str(number)[:4]  # Limit to 4 digits
+        return self.send_display_command(f"DISP:{num_str}")
+    
+    def clear_display(self):
+        """Clear the display"""
+        return self.send_display_command("DISP:CLR")
+    
+    def set_brightness(self, level):
+        """Set brightness (0-7)"""
+        level = max(0, min(7, int(level)))  # Clamp to 0-7
+        return self.send_display_command(f"DISP:BRT:{level}")
+    
+    def turn_on(self):
+        """Turn display on"""
+        return self.send_display_command("DISP:ON")
+    
+    def turn_off(self):
+        """Turn display off"""
+        return self.send_display_command("DISP:OFF")
+
 class ChannelDialer:
-    def __init__(self, digit_timeout=1.5, easter_egg_timeout=1.5):
+    def __init__(self, digit_timeout=1.5, easter_egg_timeout=1.5, display_controller=None):
         self.digit_queue = deque()
         self.digit_timeout = digit_timeout
         self.easter_egg_timeout = easter_egg_timeout
         self.last_digit_time = 0
         self.timer = None
         self.lock = threading.Lock()
+        self.display = display_controller
+        self.current_channel = 1  # Track current channel, default to 1
         
         # Easter egg mappings - add more as needed
         self.easter_eggs = {
@@ -46,13 +124,17 @@ class ChannelDialer:
                 self.digit_queue.append(str(digit))
                 self.last_digit_time = time.time()
                 
+                # Show current digit sequence on display
+                current_sequence = ''.join(self.digit_queue)
+                if self.display:
+                    self.display.display_text(current_sequence)
+                
                 # Cancel existing timer
                 if self.timer:
                     self.timer.cancel()
                     self.timer = None
                 
                 # Check for immediate Easter egg matches (like 911)
-                current_sequence = ''.join(self.digit_queue)
                 if current_sequence in self.easter_eggs:
                     print(f"🎯 Easter egg triggered: {current_sequence}")
                     try:
@@ -61,6 +143,10 @@ class ChannelDialer:
                         print(f"Easter egg execution error: {e}")
                     # Clear queue but don't return - system is ready for new input
                     self.digit_queue.clear()
+                    # Show current channel on display after easter egg
+                    if self.display:
+                        time.sleep(1)  # Brief pause to show easter egg feedback
+                        self.display.display_number(self.current_channel)
                     print("🎮 Ready for new input...")
                     return
                 
@@ -83,6 +169,9 @@ class ChannelDialer:
                 if self.timer:
                     self.timer.cancel()
                     self.timer = None
+                # Show current channel when clearing
+                if self.display:
+                    self.display.display_number(self.current_channel)
         except Exception as e:
             print(f"Clear queue error: {e}")
             # Force clear even if lock fails
@@ -110,12 +199,21 @@ class ChannelDialer:
                         self.easter_eggs[channel_str]()
                     except Exception as e:
                         print(f"Easter egg execution error: {e}")
+                    # Show current channel after easter egg
+                    if self.display:
+                        time.sleep(1)
+                        self.display.display_number(self.current_channel)
                 else:
                     try:
                         channel_num = int(channel_str)
                         self.tune_to_channel(channel_num)
                     except ValueError:
                         print(f"❌ Invalid channel sequence: {channel_str}")
+                        # Show error briefly, then return to current channel
+                        if self.display:
+                            self.display.display_text("ERR")
+                            time.sleep(1)
+                            self.display.display_number(self.current_channel)
                 
                 self.digit_queue.clear()
                 self.timer = None
@@ -126,15 +224,77 @@ class ChannelDialer:
                 with self.lock:
                     self.digit_queue.clear()
                     self.timer = None
+                    # Fallback to showing current channel
+                    if self.display:
+                        self.display.display_number(self.current_channel)
             except:
                 pass
     
     def tune_to_channel(self, channel):
-        """Tune to specific channel number"""
-        print(f"📺 Tuning to channel {channel}")
+        """Tune to specific channel number with validation"""
+        print(f"📺 Attempting to tune to channel {channel}")
+        
+        # Check if channel is valid
+        if channel in VALID_CHANNELS:
+            print(f"✅ Valid channel: {channel}")
+            self.current_channel = channel
+            if self.display:
+                self.display.display_number(channel)
+            write_json_to_socket({
+                "command": "direct", 
+                "channel": channel,
+                "valid": True,
+                "timestamp": time.time()
+            })
+        else:
+            print(f"❌ Invalid channel: {channel} (valid: {VALID_CHANNELS})")
+            # Show invalid channel briefly, then revert to current
+            if self.display:
+                self.display.display_text("INVD")
+                time.sleep(1.5)
+                self.display.display_number(self.current_channel)
+            # Still send the command but mark as invalid - let TV decide
+            write_json_to_socket({
+                "command": "direct", 
+                "channel": channel,
+                "valid": False,
+                "fallback_channel": self.current_channel,
+                "timestamp": time.time()
+            })
+    
+    def channel_up(self):
+        """Handle channel up with validation"""
+        # Find next valid channel
+        current_idx = VALID_CHANNELS.index(self.current_channel) if self.current_channel in VALID_CHANNELS else 0
+        next_idx = (current_idx + 1) % len(VALID_CHANNELS)
+        next_channel = VALID_CHANNELS[next_idx]
+        
+        print(f"📺 Channel UP: {self.current_channel} -> {next_channel}")
+        self.current_channel = next_channel
+        if self.display:
+            self.display.display_number(self.current_channel)
+        
         write_json_to_socket({
-            "command": "direct", 
-            "channel": channel,
+            "command": "up", 
+            "channel": self.current_channel,
+            "timestamp": time.time()
+        })
+    
+    def channel_down(self):
+        """Handle channel down with validation"""
+        # Find previous valid channel
+        current_idx = VALID_CHANNELS.index(self.current_channel) if self.current_channel in VALID_CHANNELS else 0
+        prev_idx = (current_idx - 1) % len(VALID_CHANNELS)
+        prev_channel = VALID_CHANNELS[prev_idx]
+        
+        print(f"📺 Channel DOWN: {self.current_channel} -> {prev_channel}")
+        self.current_channel = prev_channel
+        if self.display:
+            self.display.display_number(self.current_channel)
+        
+        write_json_to_socket({
+            "command": "down", 
+            "channel": self.current_channel,
             "timestamp": time.time()
         })
     
@@ -142,12 +302,8 @@ class ChannelDialer:
     def emergency_mode(self):
         try:
             print("🚨 EMERGENCY MODE ACTIVATED! 🚨")
-            #write_json_to_socket({
-            #    "command": "easter_egg",
-            #    "type": "emergency",
-            #    "message": "911 Emergency Mode",
-            #    "timestamp": time.time()
-            #})
+            if self.display:
+                self.display.display_text("911!")
             # Safely try to send key to mpv
             try:
                 send_key_to_mpv('c')  # Could trigger special emergency feed
@@ -159,95 +315,67 @@ class ChannelDialer:
     def demon_mode(self):
         try:
             print("😈 DEMON MODE ACTIVATED! 😈")
-            #write_json_to_socket({
-            #    "command": "easter_egg",
-            #    "type": "demon",
-            #    "message": "666 Demon Mode - Spooky!",
-            #    "timestamp": time.time()
-            #})
-            # Could activate horror/dark content filter
+            if self.display:
+                self.display.display_text("666")
         except Exception as e:
             print(f"Demon mode error: {e}")
     
     def party_mode(self):
         try:
             print("🎉 PARTY MODE ACTIVATED! 🎉")
-            #write_json_to_socket({
-            #    "command": "easter_egg",
-            #    "type": "party",
-            #    "message": "420 Party Time!",
-            #    "timestamp": time.time()
-            #})
-            # Could activate party music or special effects
+            if self.display:
+                self.display.display_text("420")
         except Exception as e:
             print(f"Party mode error: {e}")
     
     def lucky_mode(self):
         try:
             print("🍀 LUCKY MODE ACTIVATED! 🍀")
-            #write_json_to_socket({
-            #    "command": "easter_egg",
-            #    "type": "lucky",
-            #    "message": "777 Lucky Number!",
-            #    "timestamp": time.time()
-            #})
-            # Could shuffle to random "lucky" channel
+            if self.display:
+                self.display.display_text("777")
         except Exception as e:
             print(f"Lucky mode error: {e}")
     
     def test_mode(self):
         try:
             print("🧪 TEST MODE ACTIVATED! 🧪")
-            #write_json_to_socket({
-            #    "command": "easter_egg",
-            #    "type": "test",
-            #    "message": "123 Test Sequence",
-            #    "timestamp": time.time()
-            #})
-            # Could run system diagnostics
+            if self.display:
+                self.display.display_text("TEST")
         except Exception as e:
             print(f"Test mode error: {e}")
     
     def reset_mode(self):
         try:
             print("🔄 RESET MODE ACTIVATED! 🔄")
-            #write_json_to_socket({
-            #    "command": "easter_egg",
-            #    "type": "reset",
-            #    "message": "000 System Reset",
-            #    "timestamp": time.time()
-            #})
-            # Could reset to default channel or restart system
+            if self.display:
+                self.display.display_text("RST")
+                time.sleep(1)
+            # Reset to first valid channel
+            self.current_channel = VALID_CHANNELS[0]
+            if self.display:
+                self.display.display_number(self.current_channel)
         except Exception as e:
             print(f"Reset mode error: {e}")
     
     def error_mode(self):
         try:
             print("💥 ERROR MODE ACTIVATED! 💥")
-            #write_json_to_socket({
-            #    "command": "easter_egg",
-            #    "type": "error",
-            #    "message": "404 Not Found!",
-            #    "timestamp": time.time()
-            #})
-            # Could show error screen or glitch effects
+            if self.display:
+                self.display.display_text("404")
         except Exception as e:
             print(f"Error mode error: {e}")
     
     def fun_mode(self):
         try:
             print("😄 FUN MODE ACTIVATED! 😄")
-            #write_json_to_socket({
-            #    "command": "easter_egg",
-            #    "type": "fun",
-            #    "message": "Secret fun code activated!",
-            #    "timestamp": time.time()
-            #})
+            if self.display:
+                self.display.display_text("BOOB")  # 80085 -> BOOB on 7-segment
         except Exception as e:
             print(f"Fun mode error: {e}")
 
-# Global channel dialer instance
-channel_dialer = ChannelDialer()
+# Global instances
+display_controller = None
+channel_dialer = None
 
 def write_json_to_socket(data):
     try:
@@ -271,12 +399,12 @@ def send_key_to_mpv(key):
 def CHANNEL_UP():
     print("📺 Channel UP!")
     channel_dialer.clear_queue()  # Clear any pending digits
-    write_json_to_socket({"command": "up", "channel": -1})
+    channel_dialer.channel_up()
 
 def CHANNEL_DOWN():
     print("📺 Channel DOWN!")
     channel_dialer.clear_queue()  # Clear any pending digits
-    write_json_to_socket({"command": "down", "channel": -1})
+    channel_dialer.channel_down()
 
 def EFFECT_NEXT():
     print("✨ Next effect!")
@@ -300,6 +428,11 @@ def MUTE():
 
 def POWER():
     print("⚡ Power toggle!")
+    # Clear display on power off, show channel on power on
+    if display_controller:
+        display_controller.clear_display()
+        time.sleep(0.5)
+        display_controller.display_number(channel_dialer.current_channel)
     write_json_to_socket({"command": "power_toggle", "timestamp": time.time()})
 
 def PAUSE():
@@ -308,10 +441,20 @@ def PAUSE():
 
 def INFO():
     print("ℹ️  Info display!")
+    # Show "INFO" briefly on display
+    if display_controller:
+        display_controller.display_text("INFO")
+        time.sleep(1.5)
+        display_controller.display_number(channel_dialer.current_channel)
     write_json_to_socket({"command": "info", "timestamp": time.time()})
 
 def MENU():
     print("📋 Menu!")
+    # Show "MENU" briefly on display
+    if display_controller:
+        display_controller.display_text("MENU")
+        time.sleep(1.5)
+        display_controller.display_number(channel_dialer.current_channel)
     write_json_to_socket({"command": "menu", "timestamp": time.time()})
 
 def OK():
@@ -415,18 +558,18 @@ REMOTE_CONFIGS = {
             "0x08": "DIGIT_8",
             "0x09": "DIGIT_9",
             
-            # Volume
-            "0x15": "VOLUME_UP",
-            "0x16": "VOLUME_DOWN",
-            "0x17": "MUTE",
-            
-            # Control
-            "0x18": "POWER",
-            "0x19": "PAUSE",
-            "0x1A": "INFO",
-            "0x1B": "MENU",
-            "0x1C": "OK",
-            "0x1D": "BACK",
+            ## Volume
+            #"0x15": "VOLUME_UP",
+            #"0x16": "VOLUME_DOWN",
+            #"0x17": "MUTE",
+            #
+            ## Control
+            #"0x18": "POWER",
+            #"0x19": "PAUSE",
+            #"0x1A": "INFO",
+            #"0x1B": "MENU",
+            #"0x1C": "OK",
+            #"0x1D": "BACK",
         }
     },
     "samsung_tv": {
@@ -435,10 +578,10 @@ REMOTE_CONFIGS = {
         "mappings": {
             "0x12": "CHANNEL_UP",
             "0x10": "CHANNEL_DOWN",
-            "0x07": "VOLUME_UP",
-            "0x0B": "VOLUME_DOWN",
-            "0x0F": "MUTE",
-            "0x02": "POWER",
+            #"0x07": "VOLUME_UP",
+            #"0x0B": "VOLUME_DOWN",
+            #"0x0F": "MUTE",
+            #"0x02": "POWER",
             
             # Samsung digit mappings
             "0x04": "DIGIT_1",
@@ -461,10 +604,10 @@ REMOTE_CONFIGS = {
             "0x11": "CHANNEL_DOWN",
             "0x33": "EFFECT_NEXT",
             "0x34": "EFFECT_PREV",
-            "0x12": "VOLUME_UP",
-            "0x13": "VOLUME_DOWN",
-            "0x14": "MUTE",
-            "0x15": "POWER",
+            #"0x12": "VOLUME_UP",
+            #"0x13": "VOLUME_DOWN",
+            #"0x14": "MUTE",
+            #"0x15": "POWER",
             
             # Sony digit mappings
             "0x00": "DIGIT_1",
@@ -507,9 +650,15 @@ def setup_logging(log_to_file=False):
     return None
 
 def main():
-    parser = argparse.ArgumentParser(description='Enhanced IR Remote Event Mapper with Channel Dialing')
+    global display_controller, channel_dialer
+    
+    parser = argparse.ArgumentParser(description='Enhanced IR Remote Event Mapper with Channel Dialing and 7-Segment Display')
     parser.add_argument('--device', '-d', default='/dev/ttyACM0',
                         help='Flipper Zero serial device')
+    parser.add_argument('--display-device', default=None,
+                        help='7-segment display serial device (e.g., /dev/ttyUSB0)')
+    parser.add_argument('--display-baud', type=int, default=9600,
+                        help='Display serial baudrate')
     parser.add_argument('--debug', action='store_true',
                         help='Show raw IR data')
     parser.add_argument('--debounce', '-t', type=float, default=0.7,
@@ -520,11 +669,22 @@ def main():
                         help='Log output to file instead of terminal')
     parser.add_argument('--verbose-unknowns', action='store_true',
                         help='Print protocol/address/command for unknown signals')
+    parser.add_argument('--display-brightness', type=int, default=7, choices=range(8),
+                        help='Initial display brightness (0-7)')
     args = parser.parse_args()
 
-    # Set the digit timeout for the channel dialer
-    global channel_dialer
-    channel_dialer = ChannelDialer(digit_timeout=args.digit_timeout)
+    # Initialize display controller
+    display_controller = DisplayController(args.display_device, args.display_baud)
+    if display_controller.display_serial:
+        display_controller.set_brightness(args.display_brightness)
+        display_controller.turn_on()
+
+    # Initialize channel dialer with display
+    channel_dialer = ChannelDialer(digit_timeout=args.digit_timeout, display_controller=display_controller)
+    
+    # Show initial channel on display
+    if display_controller.display_serial:
+        display_controller.display_number(channel_dialer.current_channel)
 
     log_file = setup_logging(args.log_to_file)
 
@@ -544,7 +704,11 @@ def main():
         flipper.write(b'ir rx\r\n')
         print(f"Enhanced IR Remote Mapper ready on {args.device}...")
         print(f"Writing JSON to: {SOCKET_PATH}")
+        print(f"Valid channels: {VALID_CHANNELS}")
+        print(f"Current channel: {channel_dialer.current_channel}")
         print(f"Channel digit timeout: {args.digit_timeout}s")
+        if display_controller.display_serial:
+            print(f"📟 Display: {args.display_device} @ {args.display_baud} baud")
         print("📺 Ready for channel dialing and Easter eggs!")
 
         while True:
@@ -569,11 +733,20 @@ def main():
     except KeyboardInterrupt:
         print("\nMapper stopped")
         channel_dialer.clear_queue()  # Clean up any pending timers
+        if display_controller and display_controller.display_serial:
+            display_controller.display_text("BYE")
+            time.sleep(1)
+            display_controller.clear_display()
     except Exception as e:
         print(f"Error: {e}")
     finally:
         try:
             flipper.close()
+        except:
+            pass
+        try:
+            if display_controller and display_controller.display_serial:
+                display_controller.display_serial.close()
         except:
             pass
         if log_file:
