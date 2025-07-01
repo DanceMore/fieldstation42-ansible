@@ -72,8 +72,8 @@
 
     - name: Clone fieldstation-remote repository
       ansible.builtin.git:
-        repo: git@github.com:DanceMore/fieldstation-remote.git
-        dest: "{{ app_home }}/fieldstation-remote"
+        repo: https://github.com/DanceMore/fieldstation-remote.git
+        dest: "{{ app_home }}/dancemore-fieldstation-remote"
         clone: yes
         update: yes
         force: yes
