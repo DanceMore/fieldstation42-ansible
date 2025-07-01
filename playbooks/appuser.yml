@@ -70,6 +70,24 @@
       ansible.builtin.debug:
         msg: "User {{ app_user }} created successfully: {{ user_check.stdout }}"
 
+    - name: Clone fieldstation-remote repository
+      ansible.builtin.git:
+        repo: git@github.com:DanceMore/fieldstation-remote.git
+        dest: "{{ app_home }}/fieldstation-remote"
+        clone: yes
+        update: yes
+        force: yes
+      become: yes
+      become_user: "{{ app_user }}"
+
+    - name: Set proper ownership on cloned repository
+      ansible.builtin.file:
+        path: "{{ app_home }}/fieldstation-remote"
+        owner: "{{ app_user }}"
+        group: "{{ app_group }}"
+        recurse: yes
+        state: directory
+
     - name: Run ansible-role-oh-my-zsh.
       ansible.builtin.include_role:
         name: "ctorgalson.oh-my-zsh"
