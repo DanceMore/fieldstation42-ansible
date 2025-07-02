@@ -8,9 +8,9 @@ c no-osd cycle-values glsl-shaders ""{% for shader in shader_files.files | map(a
 z no-osd cycle-values glsl-shaders ""{% for shader in shader_files.files | map(attribute='path') | map('basename') | sort | reverse %} "~/.config/mpv/shaders/{{ shader }}"{% endfor %}
 
 # use d for digital effect on/off cycling
-d cycle-values glsl-shaders "" "~/.config/mpv/shaders/8bit.glsl"
+d no-osd cycle-values glsl-shaders "" "~/.config/mpv/shaders/8bit.glsl"
 
 # use n for direct to $effect
-b cycle-values glsl-shaders "~/.config/mpv/shaders/hue_shift.glsl"
-n cycle-values glsl-shaders "~/.config/mpv/shaders/underwater.glsl"
-m cycle-values glsl-shaders "~/.config/mpv/shaders/bardo.glsl"
+b no-osd cycle-values glsl-shaders "~/.config/mpv/shaders/hue_shift.glsl"
+n no-osd cycle-values glsl-shaders "~/.config/mpv/shaders/underwater.glsl"
+m no-osd cycle-values glsl-shaders "~/.config/mpv/shaders/bardo.glsl"
