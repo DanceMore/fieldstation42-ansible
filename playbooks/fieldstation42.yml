@@ -107,7 +107,7 @@
 
     - name: Copy standby.png
       ansible.builtin.copy:
-        src: ../runtime/standby.png
+        src: "{{ app_home }}/FieldStation42/runtime/guide/standby.png"
         dest: "/home/{{ app_user }}/FieldStation42/runtime/standby.png"
         remote_src: true
 
