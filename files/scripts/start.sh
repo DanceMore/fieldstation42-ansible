@@ -1,7 +1,8 @@
 #!/bin/sh
 
 #ruby /home/appuser/scripts/midi-listener.rb &
-python3 -u /home/appuser/scripts/flipper_ir_remote.py >> /home/appuser/FieldStation42/runtime/ir_mapper.log &
+#python3 -u /home/appuser/scripts/flipper_ir_remote.py >> /home/appuser/FieldStation42/runtime/ir_mapper.log &
+python3 -u /home/appuser/dancemore-fieldstation-remote/main.py >> /home/appuser/FieldStation42/runtime/ir_mapper.log &
 
 cd /home/appuser/FieldStation42
 

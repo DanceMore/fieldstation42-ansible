@@ -72,9 +72,12 @@ class DisplayController:
     
     def display_number(self, number):
         """Display number (up to 4 digits)"""
-        if isinstance(number, (int, float)):
-            number = int(number)
-        num_str = str(number)[:4]  # Limit to 4 digits
+        if isinstance(number, str):
+            # Preserve string format (including leading zeros)
+            num_str = number[:4]
+        else:
+            # Convert number to string
+            num_str = str(int(number))[:4]
         return self.send_display_command(f"DISP:{num_str}")
     
     def clear_display(self):
@@ -127,7 +130,8 @@ class ChannelDialer:
                 # Show current digit sequence on display
                 current_sequence = ''.join(self.digit_queue)
                 if self.display:
-                    self.display.display_text(current_sequence)
+                    # Use display_number to handle leading zeros properly
+                    self.display.display_number(current_sequence)
                 
                 # Cancel existing timer
                 if self.timer:
