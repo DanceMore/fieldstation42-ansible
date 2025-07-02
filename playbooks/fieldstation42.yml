@@ -76,12 +76,6 @@
         dest: "/home/{{ app_user }}/FieldStation42/runtime/static.mp4"
         remote_src: true
 
-    - name: Copy standby.png
-      ansible.builtin.copy:
-        src: "/home/{{ app_user }}/FieldStation42/docs/standby.png"
-        dest: "/home/{{ app_user }}/FieldStation42/runtime/standby.png"
-        remote_src: true
-
     - name: Copy off_air_pattern.mp4
       ansible.builtin.copy:
         src: "/home/{{ app_user }}/FieldStation42/docs/off_air_pattern.mp4"
@@ -110,6 +104,12 @@
         owner: "{{ app_user }}"
         group: "{{ app_group }}"
         mode: "0644"
+
+    - name: Copy standby.png
+      ansible.builtin.copy:
+        src: ../runtime/standby.png
+        dest: "/home/{{ app_user }}/FieldStation42/runtime/standby.png"
+        remote_src: true
 
     - name: Copy channel config JSON files to FieldStation42/confs
       ansible.builtin.copy:
