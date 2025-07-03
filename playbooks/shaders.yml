@@ -27,7 +27,7 @@
     - name: Find all shader files
       find:
         paths: "{{ shaders_source_dir }}"
-        patterns: "*.glsl"
+        patterns: "**/*.glsl"
       register: shader_files
       delegate_to: localhost
 
@@ -43,7 +43,7 @@
         times: yes
         rsync_opts:
           - "--include=*.glsl"
-          - "--exclude=*"
+          - "--exclude=broken"
 
     - name: Set ownership for shader files
       file:
