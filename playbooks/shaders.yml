@@ -24,10 +24,10 @@
         group: "{{ app_group }}"
         mode: '0755'
 
-    - name: Find all shader files
+    - name: Find non-hidden shader files
       find:
         paths: "{{ shaders_source_dir }}"
-        patterns: "**/*.glsl"
+        patterns: "*.glsl"
       register: shader_files
       delegate_to: localhost
 
