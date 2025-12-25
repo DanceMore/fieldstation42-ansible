@@ -1,9 +1,9 @@
 ---
 # Main orchestration playbook
-- import_playbook: playbooks/shaders.yml
 - import_playbook: playbooks/baseline.yml
 - import_playbook: playbooks/appuser.yml
 - import_playbook: playbooks/fieldstation42-deps.yml
 - import_playbook: playbooks/fieldstation42-xorg.yml
 - import_playbook: playbooks/fieldstation42.yml
 - import_playbook: playbooks/symlinks.yml
+- import_playbook: playbooks/shaders.yml
