@@ -20,7 +20,7 @@
       ansible.builtin.git:
         repo: https://github.com/shane-mason/FieldStation42
         dest: "{{ app_home }}/FieldStation42"
-        version: main
+        version: 61041e5483c13a425ba299a2881ebeaaf0c8d276
         update: true
         force: true
       become: true
